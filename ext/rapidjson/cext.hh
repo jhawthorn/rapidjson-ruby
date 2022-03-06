@@ -3,4 +3,6 @@
 
 #include "ruby.h"
 
+#include "rapidjson/rapidjson.h"
+
 #endif /* RAPIDJSON_H */
