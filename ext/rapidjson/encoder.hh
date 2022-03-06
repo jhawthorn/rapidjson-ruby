@@ -1,11 +1,13 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 
+#include "buffer.hh"
+
 using namespace rapidjson;
 
 class RubyObjectEncoder {
-    StringBuffer buf;
-    Writer<StringBuffer> writer;
+    RubyStringBuffer buf;
+    Writer<RubyStringBuffer> writer;
 
     void encode_array(VALUE ary) {
         writer.StartArray();
@@ -91,14 +93,14 @@ class RubyObjectEncoder {
     }
 
     public:
-        RubyObjectEncoder(): depth(0), buf(), writer(buf) {
+        RubyObjectEncoder(): buf(), writer(buf), depth(0) {
         };
 
         int depth;
 
         VALUE encode(VALUE obj) {
             encode_any(obj);
-            VALUE ruby_string = rb_str_new(buf.GetString(), buf.GetSize());
-            return ruby_string;
+            //VALUE ruby_string = rb_str_new(buf.GetString(), buf.GetSize());
+            return buf.GetRubyString();
         }
 };
