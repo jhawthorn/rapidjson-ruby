@@ -1,7 +1,8 @@
-#include "rapidjson.h"
+#include "cext.hh"
 
 VALUE rb_mRapidjson;
 
+extern "C"
 void
 Init_rapidjson(void)
 {
