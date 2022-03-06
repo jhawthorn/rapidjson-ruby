@@ -13,27 +13,6 @@ class RubyObjectEncoder {
     StringBuffer buf;
     Writer<StringBuffer> writer;
 
-    void test() {
-        writer.Key("hello");
-        writer.String("world");
-        writer.Key("t");
-        writer.Bool(true);
-        writer.Key("f");
-        writer.Bool(false);
-        writer.Key("n");
-        writer.Null();
-        writer.Key("i");
-        writer.Uint(123);
-        writer.Key("pi");
-        writer.Double(3.1416);
-        writer.Key("a");
-        writer.StartArray();
-        for (unsigned i = 0; i < 4; i++)
-            writer.Uint(i);
-        writer.EndArray();
-        writer.EndObject();
-    }
-
     void encode_array(VALUE ary) {
         writer.StartArray();
         int length = RARRAY_LEN(ary);
@@ -48,7 +27,7 @@ class RubyObjectEncoder {
     void encode_key(VALUE key) {
         switch(rb_type(key)) {
             case T_STRING:
-                writer.Key(RSTRING_PTR(key), RSTRING_LEN(key));
+                writer.Key(RSTRING_PTR(key), RSTRING_LEN(key), false);
                 return;
             default:
                 raise_unknown(key);
@@ -73,7 +52,7 @@ class RubyObjectEncoder {
     }
 
     void encode_fixnum(VALUE v) {
-        writer.Int(RB_FIX2INT(v));
+        writer.Int(FIX2LONG(v));
     }
 
     void encode_float(VALUE v) {
@@ -83,7 +62,7 @@ class RubyObjectEncoder {
 
     void encode_string(VALUE v) {
         // fixme: copy boolean?
-        writer.String(RSTRING_PTR(v), RSTRING_LEN(v));
+        writer.String(RSTRING_PTR(v), RSTRING_LEN(v), false);
     }
 
     void encode_any(VALUE v) {
