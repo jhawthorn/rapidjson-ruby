@@ -22,11 +22,11 @@ struct RubyObjectHandler : public BaseReaderHandler<UTF8<>, RubyObjectHandler> {
     }
 
     bool Int64(int64_t i) {
-        return false;
+        return PutValue(RB_LONG2NUM(i));
     }
 
     bool Uint64(uint64_t u) {
-        return false;
+        return PutValue(RB_ULONG2NUM(u));
     }
 
     bool Double(double d) {

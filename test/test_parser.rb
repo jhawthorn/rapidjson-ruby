@@ -2,6 +2,8 @@
 
 require "test_helper"
 
+require "rbconfig/sizeof"
+
 class TestParser < Minitest::Test
   def parse obj
     RapidJSON.parse(obj)
@@ -24,6 +26,26 @@ class TestParser < Minitest::Test
     assert_equal 1, parse("1")
     assert_equal(-1, parse("-1"))
     assert_equal 1000, parse("1000")
+  end
+
+  def test_parse_fixnum_exponents
+    tests = []
+    0.upto(65) do |exponent|
+      pow = 2 ** exponent
+      tests.concat ((-pow-2)...(-pow+2)).to_a
+      tests.concat ((pow-2)...(pow+2)).to_a
+    end
+    tests.uniq!
+
+    # Should we test that these get represented as floats?
+    tests.reject! do |n|
+      n > RbConfig::LIMITS["UINT64_MAX"] ||
+        n < RbConfig::LIMITS["INT64_MIN"]
+    end
+
+    tests.each do |n|
+      assert_equal n, parse(n.to_s)
+    end
   end
 
   def test_parse_float
