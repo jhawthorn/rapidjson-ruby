@@ -1,3 +1,5 @@
+#pragma once
+
 #include "rapidjson/writer.h"
 #include "buffer.hh"
 
@@ -23,7 +25,7 @@ class RubyObjectEncoder {
         switch(rb_type(key)) {
             case T_SYMBOL:
                 key = rb_sym2str(key);
-                // pass through
+		/* FALLTHRU */
             case T_STRING:
                 writer.Key(RSTRING_PTR(key), RSTRING_LEN(key), false);
                 return;
@@ -96,7 +98,7 @@ class RubyObjectEncoder {
 
     void raise_unknown(VALUE obj) {
         VALUE inspect = rb_inspect(obj);
-        rb_raise(rb_eRuntimeError, "can't encode type: %s", StringValueCStr(inspect));
+        rb_raise(rb_eEncodeError, "can't encode type: %s", StringValueCStr(inspect));
     }
 
     public:

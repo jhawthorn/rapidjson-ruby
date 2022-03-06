@@ -2,7 +2,7 @@
 
 require "test_helper"
 
-class TestRapidjson < Minitest::Test
+class TestEncoder < Minitest::Test
   def encode obj
     RapidJSON.encode(obj)
   end
@@ -35,6 +35,7 @@ class TestRapidjson < Minitest::Test
 
   def test_encode_string
     assert_equal '""', encode("")
+    assert_equal '"1"', encode("1")
     assert_equal '"foo"', encode("foo")
     assert_equal '"abcdefghijklmnopqrstuvwxyz"', encode("abcdefghijklmnopqrstuvwxyz")
   end
@@ -46,9 +47,10 @@ class TestRapidjson < Minitest::Test
   end
 
   def test_encode_object
-    assert_raises RuntimeError do
+    ex = assert_raises RapidJSON::EncodeError do
       encode(Object.new)
     end
+    assert_match /can't encode type/, ex.message
   end
 
   def test_encode_true
