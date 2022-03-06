@@ -6,7 +6,12 @@ source "https://rubygems.org"
 gemspec
 
 gem "rake", "~> 13.0"
-
 gem "rake-compiler"
-
 gem "minitest", "~> 5.0"
+
+group :benchmark do
+  gem "benchmark-ips"
+  gem "oj"
+  gem "yajl-ruby"
+  gem "json"
+end
