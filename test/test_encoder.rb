@@ -50,7 +50,7 @@ class TestEncoder < Minitest::Test
     ex = assert_raises RapidJSON::EncodeError do
       encode(Object.new)
     end
-    assert_match /can't encode type/, ex.message
+    assert_match(/can't encode type/, ex.message)
   end
 
   def test_encode_true
