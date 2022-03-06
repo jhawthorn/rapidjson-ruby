@@ -39,6 +39,12 @@ class TestRapidjson < Minitest::Test
     assert_equal '"abcdefghijklmnopqrstuvwxyz"', encode("abcdefghijklmnopqrstuvwxyz")
   end
 
+  def test_encode_symbol
+    assert_equal '"foo"', encode(:foo)
+    assert_equal '"bar"', encode(:bar)
+    assert_equal '"dynamic symbol"', encode("dynamic symbol".to_sym)
+  end
+
   def test_encode_object
     assert_raises RuntimeError do
       encode(Object.new)

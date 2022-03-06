@@ -57,8 +57,11 @@ class RubyObjectEncoder {
     }
 
     void encode_string(VALUE v) {
-        // fixme: copy boolean?
         writer.String(RSTRING_PTR(v), RSTRING_LEN(v), false);
+    }
+
+    void encode_symbol(VALUE v) {
+        encode_string(rb_sym2str(v));
     }
 
     void encode_any(VALUE v) {
@@ -82,6 +85,8 @@ class RubyObjectEncoder {
                 return encode_array(v);
             case T_STRING:
                 return encode_string(v);
+            case T_SYMBOL:
+                return encode_symbol(v);
             default:
                 raise_unknown(v);
         }
