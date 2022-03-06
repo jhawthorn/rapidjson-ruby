@@ -5,9 +5,10 @@
 
 using namespace rapidjson;
 
+template <typename B = RubyStringBuffer, typename W=Writer<B>>
 class RubyObjectEncoder {
-    RubyStringBuffer buf;
-    Writer<RubyStringBuffer> writer;
+    B buf;
+    W writer;
 
     void encode_array(VALUE ary) {
         writer.StartArray();
