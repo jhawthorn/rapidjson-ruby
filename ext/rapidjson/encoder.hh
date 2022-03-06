@@ -22,6 +22,9 @@ class RubyObjectEncoder {
 
     void encode_key(VALUE key) {
         switch(rb_type(key)) {
+            case T_SYMBOL:
+                key = rb_sym2str(key);
+                // pass through
             case T_STRING:
                 writer.Key(RSTRING_PTR(key), RSTRING_LEN(key), false);
                 return;
