@@ -11,12 +11,19 @@ class RubyStringBuffer {
             mem = RSTRING_PTR(ruby_string);
         }
 
-        void Put(Ch c) {
-            if (used == capacity) {
+        void Reserve(size_t size) {
+            if (capacity - used < size) {
                 resize(capacity * 2);
             }
+        }
 
+        void PutUnsafe(Ch c) {
             mem[used++] = c;
+        }
+
+        void Put(Ch c) {
+            Reserve(1);
+            PutUnsafe(c);
         }
 
         void Flush() {
@@ -45,3 +52,15 @@ class RubyStringBuffer {
         RubyStringBuffer(const RubyStringBuffer&);
         RubyStringBuffer& operator=(const RubyStringBuffer&);
 };
+
+inline void PutReserve(RubyStringBuffer &stream, size_t count) {
+    stream.Reserve(count);
+}
+
+inline void PutUnsafe(RubyStringBuffer &stream, char c) {
+    stream.PutUnsafe(c);
+}
+
+//inline void PutN(RubyStringBuffer &stream, char c, size_t n) {
+//    std::memset(stream..Push<char>(n), c, n * sizeof(c));
+//}
