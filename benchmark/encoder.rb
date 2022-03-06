@@ -29,4 +29,4 @@ end
 
 benchmark_encoding "small nested array", [[1,2,3,4,5]]*10
 benchmark_encoding "small hash", { "username" => "jhawthorn", "id" => 123, "event" => "wrote json serializer" }
-benchmark_encoding "canada.json", JSON.load_file("#{__dir__}/test/data/canada.json")
+benchmark_encoding "canada.json", JSON.load_file("#{__dir__}/../test/data/canada.json")

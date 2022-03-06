@@ -14,4 +14,5 @@ group :benchmark do
   gem "oj"
   gem "yajl-ruby"
   gem "json"
+  gem "fast_jsonparser"
 end
