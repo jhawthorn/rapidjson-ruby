@@ -1,6 +1,4 @@
 #include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-
 #include "buffer.hh"
 
 using namespace rapidjson;
