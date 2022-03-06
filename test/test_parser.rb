@@ -26,6 +26,10 @@ class TestParser < Minitest::Test
     assert_equal 1000, parse("1000")
   end
 
+  def test_parse_float
+    assert_equal 1.0, parse("1.0")
+  end
+
   def test_parse_string
     assert_equal "", parse('""')
     assert_equal "1", parse('"1"')

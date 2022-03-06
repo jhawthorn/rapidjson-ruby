@@ -21,9 +21,17 @@ struct RubyObjectHandler : public BaseReaderHandler<UTF8<>, RubyObjectHandler> {
         return PutValue(INT2FIX(u));
     }
 
-    bool Int64(int64_t i) { cout << "Int64(" << i << ")" << endl; return true; }
-    bool Uint64(uint64_t u) { cout << "Uint64(" << u << ")" << endl; return true; }
-    bool Double(double d) { cout << "Double(" << d << ")" << endl; return true; }
+    bool Int64(int64_t i) {
+        return false;
+    }
+
+    bool Uint64(uint64_t u) {
+        return false;
+    }
+
+    bool Double(double d) {
+        return PutValue(rb_float_new(d));
+    }
 
     bool String(const char* str, SizeType length, bool copy) {
         VALUE string = rb_str_new(str, length);
