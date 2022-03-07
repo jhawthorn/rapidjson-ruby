@@ -43,8 +43,11 @@ struct RubyObjectHandler : public BaseReaderHandler<UTF8<>, RubyObjectHandler> {
     }
 
     bool Key(const char* str, SizeType length, bool copy) {
-        // FIXME: check for availability of rb_interned_str
+#ifdef HAVE_RB_INTERNED_STR
         VALUE val = rb_interned_str(str, length);
+#else
+        VALUE val = rb_str_new(str, length);
+#endif
         return PutKey(val);
     }
 
