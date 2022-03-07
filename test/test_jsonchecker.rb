@@ -12,12 +12,14 @@ class TestJsonchecker < Minitest::Test
     define_method(:"test_#{name}") do
       original_json = File.read(filename)
       if name.start_with?("fail") && !exclude
+        refute RapidJSON.valid_json?(original_json)
         ex = assert_raises RapidJSON::ParseError do
           RapidJSON.parse(original_json)
         end
         re = /JSON parse error: .* \(\d+\)\z/
         assert_match re, ex.message
       else
+        assert RapidJSON.valid_json?(original_json)
         assert RapidJSON.parse(original_json)
       end
     end

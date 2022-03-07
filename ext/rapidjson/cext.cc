@@ -40,6 +40,20 @@ VALUE parse(VALUE _self, VALUE string) {
     return handler.GetRoot();
 }
 
+VALUE valid_json_p(VALUE _self, VALUE string) {
+    NullHandler handler;
+    Reader reader;
+    char *cstring = StringValueCStr(string); // fixme?
+    StringStream ss(cstring);
+    ParseResult ok = reader.Parse(ss, handler);
+
+    if (!ok) {
+        return Qfalse;
+    }
+
+    return Qtrue;
+}
+
 extern "C" void
 Init_rapidjson(void)
 {
@@ -50,6 +64,7 @@ Init_rapidjson(void)
 
     rb_define_module_function(rb_mRapidjson, "parse", parse, 1);
     rb_define_module_function(rb_mRapidjson, "load", parse, 1);
+    rb_define_module_function(rb_mRapidjson, "valid_json?", valid_json_p, 1);
 
     rb_eParseError = rb_define_class_under(rb_mRapidjson, "ParseError", rb_eStandardError);
     rb_eEncodeError = rb_define_class_under(rb_mRapidjson, "EncodeError", rb_eStandardError);

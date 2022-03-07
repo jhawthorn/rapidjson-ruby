@@ -4,6 +4,9 @@
 
 using namespace rapidjson;
 
+class NullHandler : public BaseReaderHandler<UTF8<>, NullHandler> {
+};
+
 struct RubyObjectHandler : public BaseReaderHandler<UTF8<>, RubyObjectHandler> {
     bool Null() {
         return PutValue(Qnil);
