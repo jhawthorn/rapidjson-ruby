@@ -35,4 +35,6 @@ benchmark_parsing "test from oj", <<JSON
 {"a":"Alpha","b":true,"c":12345,"d":[true,[false,[-123456789,null],3.9676,["Something else.",false],null]],"e":{"zero":null,"one":1,"two":2,"three":[3],"four":[0,1,2,3,4]},"f":null,"h":{"a":{"b":{"c":{"d":{"e":{"f":{"g":null}}}}}}},"i":[[[[[[[null]]]]]]]}
 JSON
 
+benchmark_parsing "twitter.json", File.read("#{__dir__}/../test/data/twitter.json")
+benchmark_parsing "citm_catalog.json", File.read("#{__dir__}/../test/data/citm_catalog.json")
 benchmark_parsing "canada.json", File.read("#{__dir__}/../test/data/canada.json")
