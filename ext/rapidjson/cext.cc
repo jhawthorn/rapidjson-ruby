@@ -49,6 +49,7 @@ Init_rapidjson(void)
     rb_define_module_function(rb_mRapidjson, "dump", encode, 1);
 
     rb_define_module_function(rb_mRapidjson, "parse", parse, 1);
+    rb_define_module_function(rb_mRapidjson, "load", parse, 1);
 
     rb_eParseError = rb_define_class_under(rb_mRapidjson, "ParseError", rb_eStandardError);
     rb_eEncodeError = rb_define_class_under(rb_mRapidjson, "EncodeError", rb_eStandardError);
