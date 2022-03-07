@@ -2,8 +2,6 @@
 
 require "test_helper"
 
-require "rbconfig/sizeof"
-
 class TestParser < Minitest::Test
   def parse obj
     RapidJSON.parse(obj)
@@ -26,6 +24,8 @@ class TestParser < Minitest::Test
     assert_equal 1, parse("1")
     assert_equal(-1, parse("-1"))
     assert_equal 1000, parse("1000")
+
+    assert_equal 4294967295, parse("4294967295") # 2**32 - 1
   end
 
   def test_parse_fixnum_exponents

@@ -52,7 +52,23 @@ class RubyObjectEncoder {
     }
 
     void encode_fixnum(VALUE v) {
-        writer.Int(FIX2LONG(v));
+        writer.Int64(FIX2LONG(v));
+    }
+
+    void encode_bignum(VALUE b) {
+        b = rb_big_norm(b);
+        if (FIXNUM_P(b)) {
+            return encode_fixnum(b);
+        }
+
+        bool negative = rb_big_cmp(b, INT2FIX(0)) == INT2FIX(-1);
+        if (negative) {
+            long long ll = rb_big2ll(b);
+            writer.Int64(ll);
+        } else {
+            unsigned long long ull = rb_big2ull(b);
+            writer.Uint64(ull);
+        }
     }
 
     void encode_float(VALUE v) {
@@ -81,6 +97,8 @@ class RubyObjectEncoder {
                 return;
             case T_FIXNUM:
                 return encode_fixnum(v);
+            case T_BIGNUM:
+                return encode_bignum(v);
             case T_FLOAT:
                 return encode_float(v);
             case T_HASH:

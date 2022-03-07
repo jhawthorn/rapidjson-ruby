@@ -22,6 +22,32 @@ class TestEncoder < Minitest::Test
     assert_equal "123", encode(123)
   end
 
+  def test_encode_bignum
+    assert_equal "9223372036854775808", encode(2**63)
+    assert_equal "9223372036854775809", encode(2**63 + 1)
+    assert_equal "18446744073709551615", encode(2**64 - 1)
+  end
+
+  def test_encode_fixnum_exponents
+    tests = []
+    0.upto(65) do |exponent|
+      pow = 2 ** exponent
+      tests.concat ((-pow-2)...(-pow+2)).to_a
+      tests.concat ((pow-2)...(pow+2)).to_a
+    end
+    tests.uniq!
+
+    # Should we test that these get represented as floats?
+    tests.reject! do |n|
+      n > RbConfig::LIMITS["UINT64_MAX"] ||
+        n < RbConfig::LIMITS["INT64_MIN"]
+    end
+
+    tests.each do |n|
+      assert_equal n.to_s, encode(n)
+    end
+  end
+
   def test_encode_float
     assert_equal "0.0", encode(0.0)
     assert_equal "-0.0", encode(-0.0)
