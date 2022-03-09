@@ -25,12 +25,16 @@ class RubyObjectEncoder {
         switch(rb_type(key)) {
             case T_SYMBOL:
                 key = rb_sym2str(key);
-		/* FALLTHRU */
+                /* FALLTHRU */
             case T_STRING:
                 writer.Key(RSTRING_PTR(key), RSTRING_LEN(key), false);
                 return;
             default:
-                raise_unknown(key);
+                {
+                    VALUE str = rb_funcall(key, id_to_s, 0);
+                    Check_Type(str, T_STRING);
+                    encode_string(str);
+                }
         }
     }
 
@@ -131,11 +135,6 @@ class RubyObjectEncoder {
             default:
                 encode_generic(v);
         }
-    }
-
-    void raise_unknown(VALUE obj) {
-        VALUE inspect = rb_inspect(obj);
-        rb_raise(rb_eEncodeError, "can't encode type: %s", StringValueCStr(inspect));
     }
 
     public:

@@ -59,6 +59,13 @@ class TestEncoder < Minitest::Test
     assert_equal '{"foo":"bar"}', encode({ "foo" => "bar" })
   end
 
+  def test_encode_hash_nonstring_keys
+    assert_equal '{"1":2}', encode({1 => 2})
+    assert_equal '{"{1=>2}":3}', encode({{1 => 2} => 3})
+    assert_equal '{"[\\"foo\\"]":"bar"}', encode({["foo"] => "bar"})
+    assert_match(/{"#<Object:0x[0-9a-f]+>":2}/, encode({Object.new => 2}))
+  end
+
   def test_encode_string
     assert_equal '""', encode("")
     assert_equal '"1"', encode("1")
