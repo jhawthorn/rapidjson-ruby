@@ -84,6 +84,25 @@ class RubyObjectEncoder {
         encode_string(rb_sym2str(v));
     }
 
+    void encode_raw_json_str(VALUE s) {
+        const char *cstr = RSTRING_PTR(s);
+        size_t len = RSTRING_LEN(s);
+
+	writer.RawValue(cstr, len, kObjectType);
+    }
+
+    void encode_generic(VALUE obj) {
+        if (rb_respond_to(obj, id_to_json)) {
+            VALUE str = rb_funcall(obj, id_to_json, 0);
+            Check_Type(str, T_STRING);
+            encode_raw_json_str(str);
+        } else {
+            VALUE str = rb_funcall(obj, id_to_s, 0);
+            Check_Type(str, T_STRING);
+            encode_string(str);
+        }
+    }
+
     void encode_any(VALUE v) {
         switch(rb_type(v)) {
             case T_NIL:
@@ -110,7 +129,7 @@ class RubyObjectEncoder {
             case T_SYMBOL:
                 return encode_symbol(v);
             default:
-                raise_unknown(v);
+                encode_generic(v);
         }
     }
 

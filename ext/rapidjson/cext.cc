@@ -1,12 +1,15 @@
 #include "cext.hh"
 
-VALUE rb_mRapidjson;
-VALUE rb_eParseError;
-VALUE rb_eEncodeError;
-
 #include "rapidjson/writer.h"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/error/en.h"
+
+static VALUE rb_mRapidjson;
+static VALUE rb_eParseError;
+static VALUE rb_eEncodeError;
+
+static ID id_to_json;
+static ID id_to_s;
 
 #include "encoder.hh"
 #include "parser.hh"
@@ -57,6 +60,9 @@ VALUE valid_json_p(VALUE _self, VALUE string) {
 extern "C" void
 Init_rapidjson(void)
 {
+    id_to_s = rb_intern("to_s");
+    id_to_json = rb_intern("to_json");
+
     rb_mRapidjson = rb_define_module("RapidJSON");
     rb_define_module_function(rb_mRapidjson, "encode", encode, 1);
     rb_define_module_function(rb_mRapidjson, "pretty_encode", pretty_encode, 1);

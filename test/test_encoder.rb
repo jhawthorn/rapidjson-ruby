@@ -73,10 +73,27 @@ class TestEncoder < Minitest::Test
   end
 
   def test_encode_object
-    ex = assert_raises RapidJSON::EncodeError do
-      encode(Object.new)
+    assert_match(/\A"#<Object:0x[0-9a-f]+>"\z/, encode(Object.new))
+  end
+
+  def test_to_json
+    klass = Class.new do
+      def to_json
+        '{ "amazing":"custom json" }'
+      end
     end
-    assert_match(/can't encode type/, ex.message)
+
+    assert_equal '{ "amazing":"custom json" }', encode(klass.new)
+  end
+
+  def test_to_s
+    klass = Class.new do
+      def to_s
+        "amazing object!"
+      end
+    end
+
+    assert_equal '"amazing object!"', encode(klass.new)
   end
 
   def test_encode_true
