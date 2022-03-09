@@ -4,7 +4,12 @@ require "test_helper"
 
 class TestEncoder < Minitest::Test
   def encode obj
-    RapidJSON.encode(obj)
+    if ENV["TEST_JSON"]
+      require "json"
+      JSON.dump(obj)
+    else
+      RapidJSON.encode(obj)
+    end
   end
 
   def test_encode_array

@@ -1,8 +1,6 @@
-# Rapidjson
+# RapidJSON
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/rapidjson`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+(Maybe) Ruby's fastest JSON library! Built using the [RapidJSON C++ library](https://rapidjson.org/)
 
 ## Installation
 
@@ -22,7 +20,76 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```
+RapidJSON.parse <<JSON
+{
+  "foo":"bar"
+}
+JSON
+# => {"foo" => "bar"}
+```
+
+```
+RapidJSON.encode(json_string)
+# => '{"foo":"bar"}'
+```
+
+```
+RapidJSON.pretty_encode(json_string)
+# =>
+# {
+#    "foo": "bar"
+# }
+```
+
+## Performance
+
+Your current JSON parser/encoder is probably fine.
+
+Unless there's good reason, it's probably best sticking with the standard `json` gem, which ships with Ruby. It become much faster in version 2.3, so try it again if you haven't recently!
+
+However this library has a few performance advantages:
+
+* JSON parsing
+  * Performance is achieved mostly through using RapidJSON one of the fastest open source JSON parsing libraries. It supports SIMD (SSE2, SSE4.2, NEON), avoids allocated memory, and has been honed to be if not the fastest library (that honour likely going to simdjson) the library to beat for JSON performance.
+* Object allocation
+  * Wherever possible we avoid allocating objects. When generating JSON, RapidJSON will write the emitted JSON directly into the buffer of a Ruby string. (This is an optimization most Ruby JSON libraries will have)
+  * When parsing JSON we parse directly form the source string with a single copy
+  * When building a Hash for a JSON object, we use an fstrings (dedup'd and frozen strings) as the key
+  * Whenever possible we build Ruby objects from C types (int, char \*, double) rather than constructing intermediate Ruby string objects.
+
+Many of these optimization can be found in all popular Ruby JSON libraries
+
+```
+== Encoding canada.json (2090234 bytes)
+                yajl     13.957  (± 0.0%) i/s -     70.000  in   5.015358s
+                json     13.912  (± 0.0%) i/s -     70.000  in   5.032247s
+                  oj     20.821  (± 0.0%) i/s -    106.000  in   5.090981s
+           rapidjson     84.110  (± 2.4%) i/s -    424.000  in   5.042792s
+```
+
+```
+== Parsing canada.json (2251051 bytes)
+                yajl     35.510  (± 2.8%) i/s -    180.000  in   5.070803s
+                json     22.105  (± 0.0%) i/s -    112.000  in   5.067063s
+                  oj     15.163  (± 6.6%) i/s -     76.000  in   5.042864s
+     fast_jsonparser     10.791  (± 0.0%) i/s -     54.000  in   5.004290s
+           rapidjson    148.263  (± 2.0%) i/s -    742.000  in   5.006370s
+```
+Notes: oj seems unusually bad at this test, and is usually faster than yajl and
+json, and comparable to rapidjson.
+`fast_jsonparser` has been slow since Ruby 3.0, likely a bug, if fixed I'd
+expect it to be the fasest JSON parser.
+
+Other libraries may include modes to avoid constructing all objects. Currently
+RapidJSON only focuses on the patterns and APIs users are likely to actually
+use.
+
+## Why another JSON library
+
+I spent a week working on YAJL/yajl-ruby, and though I really liked the library, it hasn't kept up with the performance of the modern JSON libraries, specifically simdjson (C++), serde-json (Rust), and RapidJSON (C++). I was interested in how those libraries would integrate into Ruby. Of these, RapidJSON was the simplest fit for a Ruby extension. It's in C++ (clean Rust/Ruby bindings is unfortunately a work in progress), fast, uses SIMD instructions, supports encoding and decoding, and has a nice API to work with.
+
+However, if you're happy with your current Ruby JSON library (including `json`) you should keep using it. They're all very good.
 
 ## Development
 
