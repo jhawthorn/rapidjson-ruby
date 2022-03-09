@@ -145,7 +145,6 @@ class RubyObjectEncoder {
 
         VALUE encode(VALUE obj) {
             encode_any(obj);
-            //VALUE ruby_string = rb_str_new(buf.GetString(), buf.GetSize());
             return buf.GetRubyString();
         }
 };
