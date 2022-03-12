@@ -1,0 +1,30 @@
+name: Bench
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Benchmarks
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.1.0'
+        bundler-cache: true
+    - name: Compile
+      run: bundle exec rake compile
+    - name: Encoder benchmark
+      run: bundle exec ruby benchmark/encoder.rb
+    - name: Parser benchmark
+      run: bundle exec ruby benchmark/parser.rb
+    - name: Valiate benchmark
+      run: bundle exec ruby benchmark/validate.rb
