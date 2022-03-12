@@ -75,7 +75,7 @@ struct RubyObjectHandler : public BaseReaderHandler<UTF8<>, RubyObjectHandler> {
             depth++;
             return true;
         } else {
-            rb_raise(rb_eParseError, "JSON input too deep");
+            rb_raise(rb_eParseError, "JSON parse error: input too deep");
             return false;
         }
     }
