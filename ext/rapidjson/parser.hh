@@ -7,6 +7,19 @@
 using namespace rapidjson;
 
 class NullHandler : public BaseReaderHandler<UTF8<>, NullHandler> {
+    static const int MAX_DEPTH = 256;
+    int depth = 0;
+    bool push() {
+        return depth++ < MAX_DEPTH;
+    }
+    bool pop() {
+        return depth-- > 0;
+    }
+    public:
+    bool StartObject() { return push(); }
+    bool EndObject(SizeType s) { return pop(); }
+    bool StartArray() { return push(); }
+    bool EndArray(SizeType s) { return pop(); }
 };
 
 struct RubyObjectHandler : public BaseReaderHandler<UTF8<>, RubyObjectHandler> {
