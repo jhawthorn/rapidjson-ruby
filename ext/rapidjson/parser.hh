@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cext.hh"
+
 #include "rapidjson/reader.h"
 
 using namespace rapidjson;
@@ -37,7 +39,7 @@ struct RubyObjectHandler : public BaseReaderHandler<UTF8<>, RubyObjectHandler> {
     }
 
     bool String(const char* str, SizeType length, bool copy) {
-        VALUE string = rb_str_new(str, length);
+        VALUE string = rb_enc_str_new(str, length, rb_utf8_encoding());
         return PutValue(string);
     }
 

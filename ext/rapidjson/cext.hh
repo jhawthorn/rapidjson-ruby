@@ -2,6 +2,7 @@
 #define RAPIDJSON_H 1
 
 #include "ruby.h"
+#include "ruby/encoding.h"
 
 #ifdef __SSE2__
 #define RAPIDJSON_SSE2
