@@ -19,7 +19,7 @@ using namespace rapidjson;
 typedef RubyStringBuffer DefaultBuffer;
 
 VALUE encode(VALUE _self, VALUE obj) {
-    RubyObjectEncoder encoder;
+    RubyObjectEncoder<DefaultBuffer, Writer<DefaultBuffer>> encoder;
     return encoder.encode(obj);
 }
 
