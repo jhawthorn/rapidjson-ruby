@@ -49,7 +49,7 @@ struct RubyObjectHandler : public BaseReaderHandler<UTF8<>, RubyObjectHandler> {
 
     bool Key(const char* str, SizeType length, bool copy) {
 #ifdef HAVE_RB_INTERNED_STR
-        VALUE val = rb_interned_str(str, length);
+        VALUE val = rb_enc_interned_str(str, length, rb_utf8_encoding());
 #else
         VALUE val = rb_str_new(str, length);
 #endif
