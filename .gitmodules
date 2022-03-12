@@ -1,3 +1,6 @@
 [submodule "ext/rapidjson/rapidjson"]
 	path = ext/rapidjson/rapidjson
 	url = https://github.com/Tencent/rapidjson/
+[submodule "test/data/JSONTestSuite"]
+	path = test/data/JSONTestSuite
+	url = https://github.com/nst/JSONTestSuite
