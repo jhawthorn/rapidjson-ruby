@@ -20,7 +20,7 @@ Or install it yourself as:
 
 ## Usage
 
-```
+``` ruby
 RapidJSON.parse <<JSON
 {
   "foo":"bar"
@@ -29,12 +29,12 @@ JSON
 # => {"foo" => "bar"}
 ```
 
-```
+``` ruby
 RapidJSON.encode(json_string)
 # => '{"foo":"bar"}'
 ```
 
-```
+``` ruby
 RapidJSON.pretty_encode(json_string)
 # =>
 # {
