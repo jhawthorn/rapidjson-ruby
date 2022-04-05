@@ -41,7 +41,7 @@ class RubyStringBuffer {
             capacity = newcap;
         }
 
-        const size_t INITIAL_SIZE = 2048;
+        static const size_t INITIAL_SIZE = 2048;
 
         VALUE ruby_string;
 

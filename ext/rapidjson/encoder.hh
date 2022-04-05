@@ -5,7 +5,7 @@
 
 using namespace rapidjson;
 
-template <typename B = RubyStringBuffer, typename W=Writer<B>>
+template <typename B = RubyStringBuffer, typename W=Writer<B> >
 class RubyObjectEncoder {
     B buf;
     W writer;

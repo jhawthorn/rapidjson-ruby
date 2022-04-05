@@ -8,7 +8,7 @@ using namespace rapidjson;
 
 class NullHandler : public BaseReaderHandler<UTF8<>, NullHandler> {
     static const int MAX_DEPTH = 256;
-    int depth = 0;
+    int depth;
     bool push() {
         return depth++ < MAX_DEPTH;
     }
@@ -16,6 +16,8 @@ class NullHandler : public BaseReaderHandler<UTF8<>, NullHandler> {
         return depth-- > 0;
     }
     public:
+    NullHandler(): depth(0) {
+    }
     bool StartObject() { return push(); }
     bool EndObject(SizeType s) { return pop(); }
     bool StartArray() { return push(); }
