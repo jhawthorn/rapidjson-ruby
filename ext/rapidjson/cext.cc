@@ -18,17 +18,20 @@ using namespace rapidjson;
 
 typedef RubyStringBuffer DefaultBuffer;
 
-VALUE encode(VALUE _self, VALUE obj) {
+static VALUE
+encode(VALUE _self, VALUE obj) {
     RubyObjectEncoder<DefaultBuffer, Writer<DefaultBuffer> > encoder;
     return encoder.encode(obj);
 }
 
-VALUE pretty_encode(VALUE _self, VALUE obj) {
+static VALUE
+pretty_encode(VALUE _self, VALUE obj) {
     RubyObjectEncoder<DefaultBuffer, PrettyWriter<DefaultBuffer> > encoder;
     return encoder.encode(obj);
 }
 
-VALUE parse(VALUE _self, VALUE string) {
+static VALUE
+parse(VALUE _self, VALUE string) {
     RubyObjectHandler handler;
     Reader reader;
     char *cstring = StringValueCStr(string); // fixme?
@@ -43,7 +46,8 @@ VALUE parse(VALUE _self, VALUE string) {
     return handler.GetRoot();
 }
 
-VALUE valid_json_p(VALUE _self, VALUE string) {
+static VALUE
+valid_json_p(VALUE _self, VALUE string) {
     NullHandler handler;
     Reader reader;
     char *cstring = StringValueCStr(string); // fixme?
