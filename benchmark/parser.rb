@@ -23,6 +23,7 @@ def benchmark_parsing(name, json_output)
     x.report("json")      { JSON.parse(json_output) } if RUN[:json]
     x.report("oj")        { Oj.load(json_output) } if RUN[:oj]
     x.report("oj strict") { Oj.strict_load(json_output) } if RUN[:oj]
+    x.report("Oj::Parser") { Oj::Parser.usual.parse(json_output) } if RUN[:oj]
     x.report("fast_jsonparser") { FastJsonparser.parse(json_output) } if RUN[:fast_jsonparser]
     x.report("rapidjson") { RapidJSON.parse(json_output) } if RUN[:rapidjson]
   end
