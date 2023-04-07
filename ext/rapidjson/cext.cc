@@ -4,7 +4,7 @@
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/error/en.h"
 
-static VALUE rb_mRapidjson;
+static VALUE rb_mRapidJSON;
 static VALUE rb_eParseError;
 static VALUE rb_eEncodeError;
 
@@ -67,15 +67,15 @@ Init_rapidjson(void)
     id_to_s = rb_intern("to_s");
     id_to_json = rb_intern("to_json");
 
-    rb_mRapidjson = rb_define_module("RapidJSON");
-    rb_define_module_function(rb_mRapidjson, "encode", encode, 1);
-    rb_define_module_function(rb_mRapidjson, "pretty_encode", pretty_encode, 1);
-    rb_define_module_function(rb_mRapidjson, "dump", encode, 1);
+    rb_mRapidJSON = rb_define_module("RapidJSON");
+    rb_define_module_function(rb_mRapidJSON, "encode", encode, 1);
+    rb_define_module_function(rb_mRapidJSON, "pretty_encode", pretty_encode, 1);
+    rb_define_module_function(rb_mRapidJSON, "dump", encode, 1);
 
-    rb_define_module_function(rb_mRapidjson, "parse", parse, 1);
-    rb_define_module_function(rb_mRapidjson, "load", parse, 1);
-    rb_define_module_function(rb_mRapidjson, "valid_json?", valid_json_p, 1);
+    rb_define_module_function(rb_mRapidJSON, "parse", parse, 1);
+    rb_define_module_function(rb_mRapidJSON, "load", parse, 1);
+    rb_define_module_function(rb_mRapidJSON, "valid_json?", valid_json_p, 1);
 
-    rb_eParseError = rb_define_class_under(rb_mRapidjson, "ParseError", rb_eStandardError);
-    rb_eEncodeError = rb_define_class_under(rb_mRapidjson, "EncodeError", rb_eStandardError);
+    rb_eParseError = rb_define_class_under(rb_mRapidJSON, "ParseError", rb_eStandardError);
+    rb_eEncodeError = rb_define_class_under(rb_mRapidJSON, "EncodeError", rb_eStandardError);
 }
