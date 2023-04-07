@@ -75,11 +75,20 @@ require "test_helper"
 class JSONCompatTest < Minitest::Test
 % TEST_CASES.each_with_index do |test, i|
   def test_<%= test.method_name %>
-    json = <%= test.original_json.inspect %>
     expected = <%= test.expected_parse.inspect %>
-
-    actual = RapidJSON.parse(json)
-    assert_equal expected, actual
+    json = <%= test.original_json.inspect %>
+    assert_json expected, json
   end
+
 % end
+  private
+
+  def assert_json(expected, json)
+    actual = RapidJSON.parse(json)
+    if expected.nil?
+      assert_nil actual
+    else
+      assert_equal expected, actual
+    end
+  end
 end
