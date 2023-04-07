@@ -119,4 +119,23 @@ class TestEncoder < Minitest::Test
   def test_encode_nil
     assert_equal "null", encode(nil)
   end
+
+  def test_encode_NaN
+    error = assert_raises RapidJSON::EncodeError do
+      encode(Float::NAN)
+    end
+    assert_match "Float::NAN is not allowed in JSON", error.message
+  end
+
+  def test_encode_Infinity
+    error = assert_raises RapidJSON::EncodeError do
+      encode(Float::INFINITY)
+    end
+    assert_match "Float::INFINITY is not allowed in JSON", error.message
+
+    error = assert_raises RapidJSON::EncodeError do
+      encode(-Float::INFINITY)
+    end
+    assert_match "Float::INFINITY is not allowed in JSON", error.message
+  end
 end
