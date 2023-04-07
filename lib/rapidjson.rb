@@ -3,7 +3,7 @@
 require_relative "rapidjson/version"
 require_relative "rapidjson/rapidjson"
 
-module Rapidjson
+module RapidJSON
   class Error < StandardError; end
   # Your code goes here...
 end

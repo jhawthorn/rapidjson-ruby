@@ -4,7 +4,7 @@ require_relative "lib/rapidjson/version"
 
 Gem::Specification.new do |spec|
   spec.name = "rapidjson"
-  spec.version = Rapidjson::VERSION
+  spec.version = RapidJSON::VERSION
   spec.authors = ["John Hawthorn"]
   spec.email = ["john@hawthorn.email"]
 
