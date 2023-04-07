@@ -59,6 +59,15 @@ class TestParser < Minitest::Test
     assert_equal "abcdefghijklmnopqrstuvwxyz", parse('"abcdefghijklmnopqrstuvwxyz"')
   end
 
+  def test_parse_bignum
+    assert_equal 340282366920938463463374607431768211456, parse("340282366920938463463374607431768211456")
+  end
+
+  def test_parse_huge_floats
+    assert_equal 34028236692093846.3463374607431768211456, parse("34028236692093846.3463374607431768211456")
+    assert_equal 0.0, parse("123.456e-789")
+  end
+
   def test_parse_invalida
     ex = assert_raises RapidJSON::ParseError do
       parse("abc")
