@@ -77,7 +77,13 @@ class RubyObjectEncoder {
 
     void encode_float(VALUE v) {
         double f = rb_float_value(v);
-        writer.Double(f);
+        if (isinf(f)) {
+            rb_raise(rb_eEncodeError, "Float::INFINITY is not allowed in JSON");
+        } else if (isnan(f)) {
+            rb_raise(rb_eEncodeError, "Float::NAN is not allowed in JSON");
+        } else {
+            writer.Double(f);
+        }
     }
 
     void encode_string(VALUE v) {

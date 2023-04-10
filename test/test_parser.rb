@@ -78,4 +78,14 @@ class TestParser < Minitest::Test
       assert parse("["*(max+1) + "]"*(max+1))
     end
   end
+
+  def test_parse_NaN_and_Infinity
+    assert_raises RapidJSON::ParseError do
+      parse("NaN")
+    end
+
+    assert_raises RapidJSON::ParseError do
+      parse("Infinity")
+    end
+  end
 end
