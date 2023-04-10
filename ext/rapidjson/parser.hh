@@ -63,10 +63,10 @@ struct RubyObjectHandler : public BaseReaderHandler<UTF8<>, RubyObjectHandler> {
     }
 
     bool Key(const char* str, SizeType length, bool copy) {
-#ifdef HAVE_RB_INTERNED_STR
+#ifdef HAVE_RB_ENC_INTERNED_STR
         VALUE val = rb_enc_interned_str(str, length, rb_utf8_encoding());
 #else
-        VALUE val = rb_str_new(str, length);
+        VALUE val = rb_enc_str_new(str, length, rb_utf8_encoding());
 #endif
         return PutKey(val);
     }

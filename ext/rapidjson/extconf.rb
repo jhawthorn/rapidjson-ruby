@@ -14,6 +14,6 @@ $CXXFLAGS += " -fsanitize=address"
 $LDFLAGS += " -fsanitize=address"
 end
 
-have_func("rb_interned_str", "ruby.h")
+have_func("rb_enc_interned_str", "ruby.h")
 
 create_makefile("rapidjson/rapidjson")
