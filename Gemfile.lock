@@ -7,14 +7,14 @@ GEM
   remote: https://rubygems.org/
   specs:
     benchmark-ips (2.10.0)
-    fast_jsonparser (0.5.0)
-    json (2.6.1)
-    minitest (5.15.0)
-    oj (3.13.11)
+    fast_jsonparser (0.6.0)
+    json (2.6.3)
+    minitest (5.17.0)
+    oj (3.13.23)
     rake (13.0.6)
-    rake-compiler (1.1.9)
+    rake-compiler (1.2.1)
       rake
-    yajl-ruby (1.4.1)
+    yajl-ruby (1.4.3)
 
 PLATFORMS
   ruby
