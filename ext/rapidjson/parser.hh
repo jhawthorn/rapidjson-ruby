@@ -33,20 +33,23 @@ struct RubyObjectHandler : public BaseReaderHandler<UTF8<>, RubyObjectHandler> {
         return PutValue(b ? Qtrue : Qfalse);
     }
 
-    bool Int(int i) {
-        return PutValue(INT2FIX(i));
-    }
+    bool RawNumber(const char *str, SizeType length, bool copy) {
+        // TODO: rapidjson::kParseInsituFlag ?
+        // char tmp_string[length + 1];
+        // memcpy(tmp_string, str, length);
+        // tmp_string[length] = '\0';
 
-    bool Uint(unsigned u) {
-        return PutValue(INT2FIX(u));
-    }
+        SizeType index = 0;
+        if (str[0] == '-') {
+            index++;
+        }
+        for (; index < length; index++) {
+            if (!isdigit(str[index])) {
+                return Double(rb_cstr_to_dbl(str, false));
+            }
+        }
 
-    bool Int64(int64_t i) {
-        return PutValue(RB_LONG2NUM(i));
-    }
-
-    bool Uint64(uint64_t u) {
-        return PutValue(RB_ULONG2NUM(u));
+        return PutValue(rb_cstr2inum(str, 10));
     }
 
     bool Double(double d) {

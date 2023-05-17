@@ -8,6 +8,8 @@ static VALUE rb_mRapidJSON;
 static VALUE rb_eParseError;
 static VALUE rb_eEncodeError;
 
+static VALUE rb_LLONG_MIN = Qnil, rb_ULLONG_MAX = Qnil;
+
 static ID id_to_json;
 static ID id_to_s;
 
@@ -36,7 +38,8 @@ parse(VALUE _self, VALUE string) {
     Reader reader;
     char *cstring = StringValueCStr(string); // fixme?
     StringStream ss(cstring);
-    ParseResult ok = reader.Parse(ss, handler);
+    // TODO: rapidjson::kParseInsituFlag ?
+    ParseResult ok = reader.Parse<rapidjson::kParseNumbersAsStringsFlag>(ss, handler);
 
     if (!ok) {
         rb_raise(rb_eParseError, "JSON parse error: %s (%lu)",
@@ -66,6 +69,12 @@ Init_rapidjson(void)
 {
     id_to_s = rb_intern("to_s");
     id_to_json = rb_intern("to_json");
+
+    rb_global_variable(&rb_LLONG_MIN);
+    rb_global_variable(&rb_ULLONG_MAX);
+
+    rb_LLONG_MIN = LL2NUM(LLONG_MIN);
+    rb_ULLONG_MAX = ULL2NUM(ULLONG_MAX);
 
     rb_mRapidJSON = rb_define_module("RapidJSON");
     rb_define_module_function(rb_mRapidJSON, "encode", encode, 1);

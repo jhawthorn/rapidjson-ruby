@@ -67,12 +67,24 @@ class RubyObjectEncoder {
 
         bool negative = rb_big_cmp(b, INT2FIX(0)) == INT2FIX(-1);
         if (negative) {
-            long long ll = rb_big2ll(b);
-            writer.Int64(ll);
-        } else {
+            if (rb_big_cmp(b, rb_LLONG_MIN) != INT2FIX(-1)) {
+                long long ll = rb_big2ll(b);
+                writer.Int64(ll);
+                return;
+            }
+        } else if (rb_big_cmp(b, rb_ULLONG_MAX) == INT2FIX(-1)) {
             unsigned long long ull = rb_big2ull(b);
             writer.Uint64(ull);
+            return;
         }
+
+        // If the number is too big, we go through Integer#to_s
+        VALUE str = rb_funcall(b, id_to_s, 0);
+        Check_Type(str, T_STRING);
+
+        // We should be able to use RawNumber here, but it's buggy
+        // https://github.com/Tencent/rapidjson/issues/852
+        writer.RawValue(RSTRING_PTR(str), RSTRING_LEN(str), kNumberType);
     }
 
     void encode_float(VALUE v) {
