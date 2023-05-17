@@ -1,15 +1,19 @@
 # frozen_string_literal: true
 
 require "test_helper"
+require "json"
 
 class TestEncoder < Minitest::Test
   def encode obj
     if ENV["TEST_JSON"]
-      require "json"
       JSON.dump(obj)
     else
       RapidJSON.encode(obj)
     end
+  end
+
+  def test_encoding
+    assert_equal Encoding::UTF_8, encode([]).encoding
   end
 
   def test_encode_array
@@ -70,9 +74,15 @@ class TestEncoder < Minitest::Test
 
   def test_encode_hash_nonstring_keys
     assert_equal '{"1":2}', encode({1 => 2})
+
     assert_equal '{"{1=>2}":3}', encode({{1 => 2} => 3})
     assert_equal '{"[\\"foo\\"]":"bar"}', encode({["foo"] => "bar"})
     assert_match(/{"#<Object:0x[0-9a-f]+>":2}/, encode({Object.new => 2}))
+
+    assert_match(/\A\{\"\#\<Object:0x[\da-f]+\>\"\:null\}\z/, encode(Object.new => nil))
+    assert_equal '{"12":null}', encode(12 => nil)
+    assert_equal '{"Integer":null}', encode(Integer => nil)
+    assert_equal '{"1970-01-01 00:00:42 UTC":null}', encode(Time.at(42).utc => nil)
   end
 
   def test_encode_string
@@ -94,7 +104,7 @@ class TestEncoder < Minitest::Test
 
   def test_to_json
     klass = Class.new do
-      def to_json
+      def to_json(_state = nil)
         '{ "amazing":"custom json" }'
       end
     end
@@ -124,22 +134,24 @@ class TestEncoder < Minitest::Test
     assert_equal "null", encode(nil)
   end
 
-  def test_encode_NaN
-    error = assert_raises RapidJSON::EncodeError do
-      encode(Float::NAN)
+  unless ENV["TEST_JSON"]
+    def test_encode_NaN
+      error = assert_raises RapidJSON::EncodeError do
+        encode(Float::NAN)
+      end
+      assert_match "Float::NAN is not allowed in JSON", error.message
     end
-    assert_match "Float::NAN is not allowed in JSON", error.message
-  end
 
-  def test_encode_Infinity
-    error = assert_raises RapidJSON::EncodeError do
-      encode(Float::INFINITY)
-    end
-    assert_match "Float::INFINITY is not allowed in JSON", error.message
+    def test_encode_Infinity
+      error = assert_raises RapidJSON::EncodeError do
+        encode(Float::INFINITY)
+      end
+      assert_match "Float::INFINITY is not allowed in JSON", error.message
 
-    error = assert_raises RapidJSON::EncodeError do
-      encode(-Float::INFINITY)
+      error = assert_raises RapidJSON::EncodeError do
+        encode(-Float::INFINITY)
+      end
+      assert_match "Float::INFINITY is not allowed in JSON", error.message
     end
-    assert_match "Float::INFINITY is not allowed in JSON", error.message
   end
 end

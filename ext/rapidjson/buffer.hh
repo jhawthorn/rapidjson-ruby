@@ -8,6 +8,7 @@ class RubyStringBuffer {
 
         RubyStringBuffer() : used(0), capacity(INITIAL_SIZE) {
             ruby_string = rb_str_buf_new(INITIAL_SIZE);
+            rb_enc_associate(ruby_string, rb_utf8_encoding());
             mem = RSTRING_PTR(ruby_string);
         }
 
