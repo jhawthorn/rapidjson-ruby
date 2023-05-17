@@ -93,7 +93,7 @@ class RubyObjectEncoder {
         const char *cstr = RSTRING_PTR(s);
         size_t len = RSTRING_LEN(s);
 
-	writer.RawValue(cstr, len, kObjectType);
+        writer.RawValue(cstr, len, kObjectType);
     }
 
     void encode_generic(VALUE obj) {
