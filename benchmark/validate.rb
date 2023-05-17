@@ -21,6 +21,7 @@ def benchmark_parsing(name, json_output)
   Benchmark.ips do |x|
     x.report("parse") { RapidJSON.parse(json_output) } if RUN[:parse]
     x.report("validate") { RapidJSON.valid_json?(json_output) } if RUN[:validate]
+    x.compare!(order: :baseline)
   end
   puts
 end

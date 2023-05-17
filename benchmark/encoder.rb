@@ -19,10 +19,11 @@ def benchmark_encoding(name, ruby_obj)
   puts "== Encoding #{name} (#{json_output.size} bytes)"
 
   Benchmark.ips do |x|
-    x.report("yajl")      { Yajl::Encoder.new.encode(ruby_obj) } if RUN[:yajl]
     x.report("json")      { JSON.dump(ruby_obj) } if RUN[:json]
+    x.report("yajl")      { Yajl::Encoder.new.encode(ruby_obj) } if RUN[:yajl]
     x.report("oj")        { Oj.dump(ruby_obj) } if RUN[:oj]
     x.report("rapidjson") { RapidJSON.encode(ruby_obj) } if RUN[:rapidjson]
+    x.compare!(order: :baseline)
   end
   puts
 end
