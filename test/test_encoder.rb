@@ -33,6 +33,10 @@ class TestEncoder < Minitest::Test
     assert_equal "18446744073709551615", encode(2**64 - 1)
   end
 
+  def test_encore_arbitrary_size_num
+    assert_equal "340282366920938463463374607431768211456", encode(2**128)
+  end
+
   def test_encode_fixnum_exponents
     tests = []
     0.upto(65) do |exponent|

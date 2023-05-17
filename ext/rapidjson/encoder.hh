@@ -60,19 +60,14 @@ class RubyObjectEncoder {
     }
 
     void encode_bignum(VALUE b) {
-        b = rb_big_norm(b);
-        if (FIXNUM_P(b)) {
-            return encode_fixnum(b);
-        }
+        // Some T_BIGNUM might be small enough to fit in long long or unsigned long long
+        // but this being the slow path, it's not really worth it.
+        VALUE str = rb_funcall(b, id_to_s, 0);
+        Check_Type(str, T_STRING);
 
-        bool negative = rb_big_cmp(b, INT2FIX(0)) == INT2FIX(-1);
-        if (negative) {
-            long long ll = rb_big2ll(b);
-            writer.Int64(ll);
-        } else {
-            unsigned long long ull = rb_big2ull(b);
-            writer.Uint64(ull);
-        }
+        // We should be able to use RawNumber here, but it's buggy
+        // https://github.com/Tencent/rapidjson/issues/852
+        writer.RawValue(RSTRING_PTR(str), RSTRING_LEN(str), kNumberType);
     }
 
     void encode_float(VALUE v) {
