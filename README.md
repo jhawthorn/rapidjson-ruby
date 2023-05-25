@@ -73,13 +73,10 @@ Many of these optimization can be found in all popular Ruby JSON libraries
                 yajl     35.510  (± 2.8%) i/s -    180.000  in   5.070803s
                 json     22.105  (± 0.0%) i/s -    112.000  in   5.067063s
                   oj     15.163  (± 6.6%) i/s -     76.000  in   5.042864s
-     fast_jsonparser     10.791  (± 0.0%) i/s -     54.000  in   5.004290s
            rapidjson    148.263  (± 2.0%) i/s -    742.000  in   5.006370s
 ```
 Notes: oj seems unusually bad at this test, and is usually faster than yajl and
 json, and comparable to rapidjson.
-`fast_jsonparser` has been slow since Ruby 3.0, likely a bug, if fixed I'd
-expect it to be the fasest JSON parser.
 
 Other libraries may include modes to avoid constructing all objects. Currently
 RapidJSON only focuses on the patterns and APIs users are likely to actually

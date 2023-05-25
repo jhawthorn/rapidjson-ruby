@@ -7,7 +7,6 @@ GEM
   remote: https://rubygems.org/
   specs:
     benchmark-ips (2.10.0)
-    fast_jsonparser (0.5.0)
     json (2.6.1)
     minitest (5.15.0)
     oj (3.13.11)
@@ -22,7 +21,6 @@ PLATFORMS
 
 DEPENDENCIES
   benchmark-ips
-  fast_jsonparser
   json
   minitest (~> 5.0)
   oj

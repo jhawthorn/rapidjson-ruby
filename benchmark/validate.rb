@@ -2,7 +2,6 @@ require "benchmark/ips"
 require "json"
 require "oj"
 require "yajl"
-require "fast_jsonparser"
 require "rapidjson"
 
 if ENV["ONLY"]
