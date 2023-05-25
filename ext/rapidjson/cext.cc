@@ -18,13 +18,13 @@ using namespace rapidjson;
 typedef RubyStringBuffer DefaultBuffer;
 
 static VALUE
-dump(VALUE _self, VALUE obj, VALUE pretty, VALUE as_json) {
+dump(VALUE _self, VALUE obj, VALUE pretty, VALUE as_json, VALUE allow_nan) {
     // NB: as_json here is not marked by the extension, but is always on the stack
     if (RTEST(pretty)) {
-        RubyObjectEncoder<DefaultBuffer, PrettyWriter<DefaultBuffer> > encoder(as_json);
+        RubyObjectEncoder<DefaultBuffer, PrettyWriter<DefaultBuffer> > encoder(as_json, RTEST(allow_nan));
         return encoder.encode(obj);
     } else {
-        RubyObjectEncoder<DefaultBuffer, Writer<DefaultBuffer> > encoder(as_json);
+        RubyObjectEncoder<DefaultBuffer, Writer<DefaultBuffer> > encoder(as_json, RTEST(allow_nan));
         return encoder.encode(obj);
     }
 }
@@ -70,7 +70,7 @@ Init_rapidjson(void)
     rb_cRapidJSONFragment = rb_const_get(rb_mRapidJSON, rb_intern("Fragment"));;
     rb_global_variable(&rb_cRapidJSONFragment);
 
-    rb_define_private_method(rb_cCoder, "_dump", dump, 3);
+    rb_define_private_method(rb_cCoder, "_dump", dump, 4);
     rb_define_method(rb_cCoder, "load", load, 1);
     rb_define_method(rb_cCoder, "valid_json?", valid_json_p, 1);
 

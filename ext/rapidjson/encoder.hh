@@ -10,6 +10,7 @@ class RubyObjectEncoder {
     B buf;
     W writer;
     VALUE as_json;
+    bool allow_nan;
 
     void encode_array(VALUE ary) {
         writer.StartArray();
@@ -87,10 +88,24 @@ class RubyObjectEncoder {
 
     void encode_float(VALUE v) {
         double f = rb_float_value(v);
-        if (isinf(f)) {
-            rb_raise(rb_eEncodeError, "Float::INFINITY is not allowed in JSON");
+        if (f == (-1.0 / 0.0)) {
+            if (allow_nan) {
+                writer.RawValue("-Infinity", 9, kObjectType);
+            } else {
+                rb_raise(rb_eEncodeError, "-Float::INFINITY is not allowed in JSON");
+            }
+        } else if (isinf(f)) {
+            if (allow_nan) {
+                writer.RawValue("Infinity", 8, kObjectType);
+            } else {
+                rb_raise(rb_eEncodeError, "Float::INFINITY is not allowed in JSON");
+            }
         } else if (isnan(f)) {
-            rb_raise(rb_eEncodeError, "Float::NAN is not allowed in JSON");
+            if (allow_nan) {
+                writer.RawValue("NaN", 3, kObjectType);
+            } else {
+                rb_raise(rb_eEncodeError, "Float::NAN is not allowed in JSON");
+            }
         } else {
             writer.Double(f);
         }
@@ -162,8 +177,9 @@ class RubyObjectEncoder {
     }
 
     public:
-        RubyObjectEncoder(VALUE as_json_proc): buf(), writer(buf), depth(0) {
+        RubyObjectEncoder(VALUE as_json_proc, bool allow_nan_): buf(), writer(buf), depth(0) {
             as_json = as_json_proc;
+            allow_nan = allow_nan_;
         };
 
         int depth;

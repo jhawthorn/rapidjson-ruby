@@ -1,36 +1,81 @@
-module ::Kernel
-  def JSON(object, opts = {})
-    if object.respond_to? :to_s
-      JSON.parse(object.to_s)
-    else
-      JSON.generate(object, opts)
-    end
-  end
-end
+require "json"
 
-module JSON
-  def self.generate(obj, opts=nil)
-    RapidJSON.encode(obj)
-  end
-
-  def self.pretty_generate(obj, opts=nil)
-    RapidJSON.pretty_encode(obj)
-  end
-
-  def self.dump(obj)
-    RapidJSON.encode(obj)
-  end
-end
-
-# to_json
 module RapidJSON
-  module JSONGemCompact
-    def to_json(opts=nil)
-      RapidJSON.encode(self)
+  module JSONGem
+    GeneratorError = RapidJSON::EncodeError
+
+    GEM = ::JSON
+    private_constant :GEM
+
+    STATE = ::JSON::State.new
+    private_constant :STATE
+
+    TO_JSON_PROC = lambda do |object, is_key|
+      if !is_key && object.respond_to?(:to_json)
+        Fragment.new(object.to_json(STATE))
+      elsif object.respond_to?(:to_s)
+        object.to_s
+      else
+        raise TypeError, "Can't serialize #{object.class} to JSON"
+      end
+    end
+    private_constant :TO_JSON_PROC
+
+    GENERATE_CODER = Coder.new(&TO_JSON_PROC)
+    private_constant :GENERATE_CODER
+
+    DUMP_CODER = Coder.new(allow_nan: true, &TO_JSON_PROC)
+    private_constant :DUMP_CODER
+
+    PRETTY_CODER = Coder.new(pretty: true, &TO_JSON_PROC)
+    private_constant :PRETTY_CODER
+
+    # Note, we very explictly fallback to the JSON gem when we receive unknown options.
+    # Unknown options may be required for security reasons (e.g. escape_slash: true)
+    # so ignoring them could lead to security vulnerabilities.
+    class << self
+      def load(string, proc = nil, options = nil)
+        if proc.nil? && options.nil?
+          DEFAULT_CODER.load(string)
+        else
+          GEM.load(string, proc, options)
+        end
+      end
+
+      def parse(string, opts = nil)
+        if opts.nil?
+          DEFAULT_CODER.load(string)
+        else
+          GEM.load(string, options)
+        end
+      end
+
+      def dump(object, anIO = nil, limit = nil)
+        if anIO.nil? && limit.nil?
+          DUMP_CODER.dump(object)
+        else
+          GEM.dump(object, anIO, limit)
+        end
+      end
+
+      def generate(object, opts = nil)
+        if opts.nil?
+          GENERATE_CODER.dump(object)
+        else
+          GEM.generate(object, opts)
+        end
+      end
+
+      private
+
+      def method_missing(name, *args)
+        GEM.public_send(name, *args)
+      end
+      ruby2_keywords :method_missing
+
+      def respond_to_missing?(name, include_private = false)
+        GEM.respond_to?(name, include_private)
+      end
     end
   end
-end
-
-[Hash, Array, String, Integer, Float, TrueClass, FalseClass, NilClass].each do |klass|
-  klass.include RapidJSON::JSONGemCompact
 end

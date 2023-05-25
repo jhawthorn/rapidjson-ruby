@@ -7,25 +7,15 @@ module RapidJSON
 
   Fragment = Struct.new(:to_json)
 
-  STDLIB_TO_JSON_PROC = lambda do |object, is_key|
-    if !is_key && object.respond_to?(:to_json)
-      Fragment.new(object.to_json)
-    elsif object.respond_to?(:to_s)
-      object.to_s
-    else
-      raise TypeError, "Can't serialize #{object.class} to JSON"
-    end
-  end
-  private_constant :STDLIB_TO_JSON_PROC
-
   class Coder
-    def initialize(pretty: false, &to_json)
+    def initialize(pretty: false, allow_nan: false, &to_json)
       @pretty = pretty
       @to_json_proc = to_json
+      @allow_nan = allow_nan
     end
 
     def dump(object)
-      _dump(object, @pretty, @to_json_proc)
+      _dump(object, @pretty, @to_json_proc, @allow_nan)
     end
   end
 end
@@ -53,9 +43,11 @@ module RapidJSON
     end
   end
 
-  DEFAULT_CODER = Coder.new(&STDLIB_TO_JSON_PROC)
+  DEFAULT_CODER = Coder.new
   private_constant :DEFAULT_CODER
 
-  PRETTY_CODER = Coder.new(pretty: true, &STDLIB_TO_JSON_PROC)
+  PRETTY_CODER = Coder.new
   private_constant :PRETTY_CODER
 end
+
+require "rapidjson/json_gem"

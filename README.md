@@ -88,6 +88,27 @@ I spent a week working on YAJL/yajl-ruby, and though I really liked the library,
 
 However, if you're happy with your current Ruby JSON library (including `json`) you should keep using it. They're all very good.
 
+## JSON gem compatibility
+
+Contrary to some other JSON libraries, `RapidJSON` doesn't provice a monkey patch to entirely replace the stdlib JSON gem.
+
+However it does provide a module that behave like the stdlib JSON gem and that can be used to monkey patch existing code.
+
+```ruby
+module SomeLibrary
+  def do_stuff(payload)
+    JSON.parse(payload)
+  end
+end
+```
+
+```ruby
+SomeLibrary::JSON = RapidJSON::JSONGem
+```
+
+Note that this module only use `RapidJSON` when it's certain it is safe to do so. If the JSON gem is called with
+some options that `RapidJSON` doesn't support, it automatically fallbacks to calling the JSON gem.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
