@@ -9,13 +9,14 @@ template <typename B = RubyStringBuffer, typename W=Writer<B> >
 class RubyObjectEncoder {
     B buf;
     W writer;
+    VALUE as_json;
 
     void encode_array(VALUE ary) {
         writer.StartArray();
         int length = RARRAY_LEN(ary);
         RARRAY_PTR_USE(ary, ptr, {
                 for (int i = 0; i < length; i++) {
-                encode_any(ptr[i]);
+                encode_any(ptr[i], true);
                 }
                 });
         writer.EndArray();
@@ -23,19 +24,33 @@ class RubyObjectEncoder {
 
     void encode_key(VALUE key) {
         switch(rb_type(key)) {
+            case T_STRING:
+                break;
             case T_SYMBOL:
                 key = rb_sym2str(key);
-                /* FALLTHRU */
-            case T_STRING:
-                writer.Key(RSTRING_PTR(key), RSTRING_LEN(key), false);
-                return;
+                break;
+            case T_FIXNUM:
+            case T_BIGNUM:
+                key = rb_String(key);
+                break;
             default:
-                {
-                    VALUE str = rb_funcall(key, id_to_s, 0);
-                    Check_Type(str, T_STRING);
-                    encode_string(str);
+                if (NIL_P(as_json)) {
+                    rb_raise(rb_eTypeError, "Invalid object key type: %" PRIsVALUE, rb_obj_class(key));
+                    UNREACHABLE_RETURN();
                 }
+
+                key = rb_funcall(as_json, id_call, 2, key, Qtrue);
+                if (rb_obj_class(key) == rb_cRapidJSONFragment) {
+                    VALUE str = rb_struct_aref(key, INT2FIX(0));
+                    Check_Type(str, T_STRING);
+                    return encode_raw_json_str(str);
+                }
+
+                break;
         }
+
+        Check_Type(key, T_STRING);
+        writer.Key(RSTRING_PTR(key), RSTRING_LEN(key), false);
     }
 
     static int encode_hash_i_cb(VALUE key, VALUE val, VALUE ctx) {
@@ -46,7 +61,7 @@ class RubyObjectEncoder {
 
     void encode_hash_i(VALUE key, VALUE val) {
         encode_key(key);
-        encode_any(val);
+        encode_any(val, true);
     }
 
     void encode_hash(VALUE hash) {
@@ -62,7 +77,7 @@ class RubyObjectEncoder {
     void encode_bignum(VALUE b) {
         // Some T_BIGNUM might be small enough to fit in long long or unsigned long long
         // but this being the slow path, it's not really worth it.
-        VALUE str = rb_funcall(b, id_to_s, 0);
+        VALUE str = rb_String(b);
         Check_Type(str, T_STRING);
 
         // We should be able to use RawNumber here, but it's buggy
@@ -93,22 +108,19 @@ class RubyObjectEncoder {
         const char *cstr = RSTRING_PTR(s);
         size_t len = RSTRING_LEN(s);
 
-	writer.RawValue(cstr, len, kObjectType);
+        writer.RawValue(cstr, len, kObjectType);
     }
 
     void encode_generic(VALUE obj) {
-        if (rb_respond_to(obj, id_to_json)) {
-            VALUE str = rb_funcall(obj, id_to_json, 0);
-            Check_Type(str, T_STRING);
-            encode_raw_json_str(str);
-        } else {
-            VALUE str = rb_funcall(obj, id_to_s, 0);
-            Check_Type(str, T_STRING);
-            encode_string(str);
+        if (NIL_P(as_json)) {
+            rb_raise(rb_eTypeError, "Don't know how to serialize %" PRIsVALUE " to JSON", rb_obj_class(obj));
+            UNREACHABLE_RETURN();
         }
+
+        encode_any(rb_funcall(as_json, id_call, 2, obj, Qfalse), false);
     }
 
-    void encode_any(VALUE v) {
+    void encode_any(VALUE v, bool generic) {
         switch(rb_type(v)) {
             case T_NIL:
                 writer.Null();
@@ -133,19 +145,31 @@ class RubyObjectEncoder {
                 return encode_string(v);
             case T_SYMBOL:
                 return encode_symbol(v);
+            case T_STRUCT:
+                if (rb_obj_class(v) == rb_cRapidJSONFragment) {
+                    VALUE str = rb_struct_aref(v, INT2FIX(0));
+                    Check_Type(str, T_STRING);
+                    return encode_raw_json_str(str);
+                }
+                // fall through
             default:
-                encode_generic(v);
+                if (generic) {
+                    encode_generic(v);
+                } else {
+                    rb_raise(rb_eTypeError, "Don't know how to serialize %" PRIsVALUE " to JSON", rb_obj_class(v));
+                }
         }
     }
 
     public:
-        RubyObjectEncoder(): buf(), writer(buf), depth(0) {
+        RubyObjectEncoder(VALUE as_json_proc): buf(), writer(buf), depth(0) {
+            as_json = as_json_proc;
         };
 
         int depth;
 
         VALUE encode(VALUE obj) {
-            encode_any(obj);
+            encode_any(obj, true);
             return buf.GetRubyString();
         }
 };

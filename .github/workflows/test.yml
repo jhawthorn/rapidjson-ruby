@@ -30,3 +30,7 @@ jobs:
         bundler-cache: true
     - name: Run the default task
       run: bundle exec rake
+    - name: Run against stdlib JSON
+      run: bundle exec rake
+      env:
+        TEST_JSON: "1"

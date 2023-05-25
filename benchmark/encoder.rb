@@ -33,3 +33,4 @@ benchmark_encoding "small hash", { "username" => "jhawthorn", "id" => 123, "even
 benchmark_encoding "twitter.json", JSON.load_file("#{__dir__}/../test/data/twitter.json")
 benchmark_encoding "citm_catalog.json", JSON.load_file("#{__dir__}/../test/data/citm_catalog.json")
 benchmark_encoding "canada.json", JSON.load_file("#{__dir__}/../test/data/canada.json")
+benchmark_encoding "many #to_json calls", [{Object.new => Object.new, 12 => 54.3, Integer => Float, Time.now => Date.today}] * 20
