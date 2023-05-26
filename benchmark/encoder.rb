@@ -8,21 +8,36 @@ if ENV["ONLY"]
   RUN = ENV["ONLY"].split(/[,: ]/).map{|x| [x.to_sym, true] }.to_h
   RUN.default = false
 elsif ENV["EXCEPT"]
-  RUN = ENV["only"].split(/[,: ]/).map{|x| [x.to_sym, false] }.to_h
+  RUN = ENV["EXCEPT"].split(/[,: ]/).map{|x| [x.to_sym, false] }.to_h
   RUN.default = true
 else
   RUN = Hash.new(true)
 end
 
+def implementations(ruby_obj)
+  {
+    json: ["json", proc { JSON.dump(ruby_obj) }],
+    yajl: ["yajl", proc { Yajl::Encoder.new.encode(ruby_obj) }],
+    oj: ["oj", proc { Oj.dump(ruby_obj) }],
+    rapidjson: ["rapidjson", proc { RapidJSON.dump(ruby_obj) }],
+    rapidjson_gem: ["rapidjson-gem", proc { RapidJSON::JSONGem.dump(ruby_obj) }],
+  }
+end
+
 def benchmark_encoding(name, ruby_obj)
   json_output = JSON.dump(ruby_obj)
-  puts "== Encoding #{name} (#{json_output.size} bytes)"
+  puts "== Encoding #{name} (#{json_output.bytesize} bytes)"
 
   Benchmark.ips do |x|
-    x.report("json")      { JSON.dump(ruby_obj) } if RUN[:json]
-    x.report("yajl")      { Yajl::Encoder.new.encode(ruby_obj) } if RUN[:yajl]
-    x.report("oj")        { Oj.dump(ruby_obj) } if RUN[:oj]
-    x.report("rapidjson") { RapidJSON.encode(ruby_obj) } if RUN[:rapidjson]
+    implementations(ruby_obj).select { |name| RUN[name] }.values.each do |name, block|
+      begin
+        block.call
+      rescue => error
+        puts "#{name} unsupported (#{error})"
+        next
+      end
+      x.report(name, &block)
+    end
     x.compare!(order: :baseline)
   end
   puts
