@@ -8,8 +8,6 @@ static VALUE rb_eParseError;
 static VALUE rb_eEncodeError;
 static VALUE rb_cRapidJSONFragment;
 
-static ID id_call;
-
 #include "encoder.hh"
 #include "parser.hh"
 
@@ -63,8 +61,6 @@ valid_json_p(VALUE _self, VALUE string) {
 extern "C" void
 Init_rapidjson(void)
 {
-    id_call = rb_intern("call");
-
     VALUE rb_mRapidJSON = rb_const_get(rb_cObject, rb_intern("RapidJSON"));
     VALUE rb_cCoder = rb_const_get(rb_mRapidJSON, rb_intern("Coder"));
     rb_cRapidJSONFragment = rb_const_get(rb_mRapidJSON, rb_intern("Fragment"));;

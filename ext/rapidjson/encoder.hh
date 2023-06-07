@@ -40,7 +40,8 @@ class RubyObjectEncoder {
                     UNREACHABLE_RETURN();
                 }
 
-                key = rb_funcall(as_json, id_call, 2, key, Qtrue);
+                VALUE args[2] = { key, Qtrue };
+                key = rb_proc_call_with_block(as_json, 2, args, Qnil);
                 if (rb_obj_class(key) == rb_cRapidJSONFragment) {
                     VALUE str = rb_struct_aref(key, INT2FIX(0));
                     Check_Type(str, T_STRING);
@@ -132,7 +133,8 @@ class RubyObjectEncoder {
             UNREACHABLE_RETURN();
         }
 
-        encode_any(rb_funcall(as_json, id_call, 2, obj, Qfalse), false);
+        VALUE args[2] = { obj, Qfalse };
+        encode_any(rb_proc_call_with_block(as_json, 2, args, Qnil), false);
     }
 
     void encode_any(VALUE v, bool generic) {
