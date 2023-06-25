@@ -10,6 +10,7 @@ static VALUE rb_cRapidJSONFragment;
 
 #include "encoder.hh"
 #include "parser.hh"
+#include "json_escape.h"
 
 using namespace rapidjson;
 
@@ -73,4 +74,6 @@ Init_rapidjson(void)
     VALUE rb_eRapidJSONError = rb_const_get(rb_mRapidJSON, rb_intern("Error"));
     rb_eParseError = rb_define_class_under(rb_mRapidJSON, "ParseError", rb_eRapidJSONError);
     rb_eEncodeError = rb_define_class_under(rb_mRapidJSON, "EncodeError", rb_eRapidJSONError);
+
+    rb_define_singleton_method(rb_mRapidJSON, "json_escape", escape_json, 1);
 }
