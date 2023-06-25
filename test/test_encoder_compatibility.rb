@@ -12,8 +12,8 @@ class TestEncoderCompatibility < Minitest::Test
   end
 
   def test_encode_fixnum
-    assert_compat -5
-    assert_compat -1
+    assert_compat(-5)
+    assert_compat(-1)
     assert_compat 0
     assert_compat 5
     assert_compat 123
@@ -45,7 +45,7 @@ class TestEncoderCompatibility < Minitest::Test
 
   def test_encode_float
     assert_compat 0.0
-    assert_compat -0.0
+    assert_compat(-0.0)
     assert_compat 155.0
   end
 
