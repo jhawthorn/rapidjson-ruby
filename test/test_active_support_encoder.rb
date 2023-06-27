@@ -67,6 +67,23 @@ class TestActiveSupportEncoder < Minitest::Test
     assert_includes ex.message, "as_json"
   end
 
+  FloatOverride = Module.new
+
+  def test_non_finite_floats
+    Float.prepend(FloatOverride)
+    FloatOverride.class_eval do
+      def as_json(options = nil)
+        finite? ? self : nil
+      end
+    end
+
+    assert_equal "null", encode(0.0 / 0.0)  # NaN
+    assert_equal "null", encode(1.0 / 0.0)  # Infinity
+    assert_equal "null", encode(-1.0 / 0.0) # -Infinity
+  ensure
+    FloatOverride.remove_method(:as_json) rescue nil
+  end
+
   def test_as_json_values
     assert_equal %q{"foo"}, encode(AsJSON.new("foo"))
     assert_equal "null", encode(AsJSON.new(nil))

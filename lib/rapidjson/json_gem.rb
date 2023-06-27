@@ -12,7 +12,13 @@ module RapidJSON
 
     TO_JSON_PROC = lambda do |object, is_key|
       if !is_key && object.respond_to?(:to_json)
-        Fragment.new(object.to_json(STATE))
+        if Float === object
+          # Avoid calling .to_json on NaN/Infinity/-Infinity
+          # Prefers our exception to one raised by ::JSON
+          object
+        else
+          Fragment.new(object.to_json(STATE))
+        end
       elsif object.respond_to?(:to_s)
         object.to_s
       else

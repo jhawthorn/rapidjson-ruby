@@ -87,25 +87,30 @@ class RubyObjectEncoder {
         writer.RawValue(RSTRING_PTR(str), RSTRING_LEN(str), kNumberType);
     }
 
-    void encode_float(VALUE v) {
+    void encode_float(VALUE v, bool generic) {
         double f = rb_float_value(v);
-        if (f == (-1.0 / 0.0)) {
-            if (allow_nan) {
-                writer.RawValue("-Infinity", 9, kObjectType);
-            } else {
-                rb_raise(rb_eEncodeError, "-Float::INFINITY is not allowed in JSON");
+        if (!isfinite(f)) {
+            if (!allow_nan && !NIL_P(as_json) && generic) {
+                return encode_generic(v);
             }
-        } else if (isinf(f)) {
-            if (allow_nan) {
-                writer.RawValue("Infinity", 8, kObjectType);
-            } else {
-                rb_raise(rb_eEncodeError, "Float::INFINITY is not allowed in JSON");
-            }
-        } else if (isnan(f)) {
-            if (allow_nan) {
-                writer.RawValue("NaN", 3, kObjectType);
-            } else {
-                rb_raise(rb_eEncodeError, "Float::NAN is not allowed in JSON");
+            if (f == (-1.0 / 0.0)) {
+                if (allow_nan) {
+                    writer.RawValue("-Infinity", 9, kObjectType);
+                } else {
+                    rb_raise(rb_eEncodeError, "-Float::INFINITY is not allowed in JSON");
+                }
+            } else if (isinf(f)) {
+                if (allow_nan) {
+                    writer.RawValue("Infinity", 8, kObjectType);
+                } else {
+                    rb_raise(rb_eEncodeError, "Float::INFINITY is not allowed in JSON");
+                }
+            } else if (isnan(f)) {
+                if (allow_nan) {
+                    writer.RawValue("NaN", 3, kObjectType);
+                } else {
+                    rb_raise(rb_eEncodeError, "Float::NAN is not allowed in JSON");
+                }
             }
         } else {
             writer.Double(f);
@@ -153,7 +158,7 @@ class RubyObjectEncoder {
             case T_BIGNUM:
                 return encode_bignum(v);
             case T_FLOAT:
-                return encode_float(v);
+                return encode_float(v, generic);
             case T_HASH:
                 return encode_hash(v);
             case T_ARRAY:
