@@ -2,6 +2,8 @@
 
 (Maybe) Ruby's fastest JSON library! Built using the [RapidJSON C++ library](https://rapidjson.org/)
 
+No monkey patches, ActiveSupport integration, `json` gem emulation.
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -41,6 +43,58 @@ RapidJSON.pretty_encode(json_string)
 #    "foo": "bar"
 # }
 ```
+
+By default the encoder is "strict" and will raise an exception
+
+## ActiveSupport
+
+RapidJSON provides a drop-in replacement ActiveSupport encoder, with very good compatibility.
+Add the following to an initializer to opt-in.
+
+```
+# config/initializers/rapidjson.rb
+
+ActiveSupport::JSON::Encoding.json_encoder = RapidJSON::ActiveSupportEncoder
+```
+
+This makes `model.to_json` ~15x faster, and `nested_hash.to_json` ~27x faster (compred using Rails 7.0)
+
+## JSON gem compatibility
+
+Contrary to some other JSON libraries, `RapidJSON` doesn't provice a monkey patch to entirely replace the stdlib JSON gem.
+
+However it does provide a module that behave like the stdlib JSON gem and that can be used to monkey patch existing code.
+
+```ruby
+module SomeLibrary
+  def do_stuff(payload)
+    JSON.parse(payload)
+  end
+end
+```
+
+```ruby
+SomeLibrary::JSON = RapidJSON::JSONGem
+```
+
+Note that this module only use `RapidJSON` when it's certain it is safe to do so. If the JSON gem is called with
+some options that `RapidJSON` doesn't support, it automatically fallbacks to calling the JSON gem.
+
+## Advanced usage
+
+By default RapidJSON will only encode "JSON-ready" types: `Hash`, `Array`, `Integer`, `Float`, `String`, `Symbol`, `true`, `false`, and `nil`.
+
+RapidJSON::Coder can be initialized with a block which allows the behaviour to be customized. This is how the ActiveSupport encoder and JSON compatibility above are implemented! Just using Ruby :heart:.
+
+```
+RapidJSON::Coder.new do |object, is_key|
+  object.to_s # Convert any unknown object to string
+end
+```
+
+The block is called only for unrecognized types. The return value is expected to be a "JSON ready" type which will then be encoded.
+
+One additional special type is `RapidJSON::Fragment`, which is interpreted as an existing JSON-encoded string. This can be used to efficiently embed an existing JSON document, or to provide compatibility.
 
 ## Performance
 
@@ -87,27 +141,6 @@ use.
 I spent a week working on YAJL/yajl-ruby, and though I really liked the library, it hasn't kept up with the performance of the modern JSON libraries, specifically simdjson (C++), serde-json (Rust), and RapidJSON (C++). I was interested in how those libraries would integrate into Ruby. Of these, RapidJSON was the simplest fit for a Ruby extension. It's in C++ (clean Rust/Ruby bindings is unfortunately a work in progress), fast, uses SIMD instructions, supports encoding and decoding, and has a nice API to work with.
 
 However, if you're happy with your current Ruby JSON library (including `json`) you should keep using it. They're all very good.
-
-## JSON gem compatibility
-
-Contrary to some other JSON libraries, `RapidJSON` doesn't provice a monkey patch to entirely replace the stdlib JSON gem.
-
-However it does provide a module that behave like the stdlib JSON gem and that can be used to monkey patch existing code.
-
-```ruby
-module SomeLibrary
-  def do_stuff(payload)
-    JSON.parse(payload)
-  end
-end
-```
-
-```ruby
-SomeLibrary::JSON = RapidJSON::JSONGem
-```
-
-Note that this module only use `RapidJSON` when it's certain it is safe to do so. If the JSON gem is called with
-some options that `RapidJSON` doesn't support, it automatically fallbacks to calling the JSON gem.
 
 ## Development
 
