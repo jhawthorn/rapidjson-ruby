@@ -35,7 +35,7 @@ module RapidJSON
     alias_method :encode, :dump
 
     def pretty_encode(object)
-      PRETTY_CODER.encode(object)
+      PRETTY_CODER.dump(object)
     end
 
     def valid_json?(string)
@@ -46,7 +46,7 @@ module RapidJSON
   DEFAULT_CODER = Coder.new
   private_constant :DEFAULT_CODER
 
-  PRETTY_CODER = Coder.new
+  PRETTY_CODER = Coder.new(pretty: true)
   private_constant :PRETTY_CODER
 end
 
