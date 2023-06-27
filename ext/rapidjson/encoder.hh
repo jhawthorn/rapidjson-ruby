@@ -8,7 +8,6 @@ using namespace rapidjson;
 template <typename B = RubyStringBuffer, typename W=Writer<B> >
 class RubyObjectEncoder {
     B buf;
-    W writer;
     VALUE as_json;
     bool allow_nan;
 
@@ -200,6 +199,7 @@ class RubyObjectEncoder {
             allow_nan = allow_nan_;
         };
 
+        W writer;
         int depth;
 
         VALUE encode(VALUE obj) {

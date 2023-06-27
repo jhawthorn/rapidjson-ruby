@@ -21,6 +21,7 @@ dump(VALUE _self, VALUE obj, VALUE pretty, VALUE as_json, VALUE allow_nan) {
     // NB: as_json here is not marked by the extension, but is always on the stack
     if (RTEST(pretty)) {
         RubyObjectEncoder<DefaultBuffer, PrettyWriter<DefaultBuffer> > encoder(as_json, RTEST(allow_nan));
+        encoder.writer.SetIndent(' ', 2);
         return encoder.encode(obj);
     } else {
         RubyObjectEncoder<DefaultBuffer, Writer<DefaultBuffer> > encoder(as_json, RTEST(allow_nan));

@@ -25,7 +25,7 @@ class TestRapidJSON < Minitest::Test
     obj = {"foo" => 123}
     json = <<~JSON.strip
       {
-          "foo": 123
+        "foo": 123
       }
     JSON
     assert_equal json, RapidJSON.pretty_encode(obj)
