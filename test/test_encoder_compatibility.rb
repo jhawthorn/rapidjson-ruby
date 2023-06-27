@@ -158,6 +158,15 @@ class TestEncoderCompatibility < Minitest::Test
     assert_compat CustomTime.new
   end
 
+  def test_character_encodings
+    ["UTF-8", "UTF-16", "UTF-32", "Shift_JIS", "Windows-31J"].each do |encoding|
+      s = "二".encode(encoding)
+      assert_compat(s)
+      assert_compat(s => s)
+      assert_compat(s.to_sym => s.to_sym)
+    end
+  end
+
   private
 
   def assert_compat(object)
