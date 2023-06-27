@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
   spec.files = Dir.chdir(File.expand_path(__dir__)) do
     [
-      Dir["ext/rapidjson/*.{hh,cc}"],
+      Dir["ext/rapidjson/*.{hh,cc,h}"],
       Dir["ext/rapidjson/rapidjson/include/**/*.h"],
       Dir["lib/**/*.rb"],
       "CODE_OF_CONDUCT.md",
