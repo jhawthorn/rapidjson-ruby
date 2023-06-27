@@ -51,3 +51,4 @@ module RapidJSON
 end
 
 require "rapidjson/json_gem"
+require "rapidjson/active_support_encoder"
