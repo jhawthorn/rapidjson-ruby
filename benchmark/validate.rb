@@ -8,7 +8,7 @@ if ENV["ONLY"]
   RUN = ENV["ONLY"].split(/[,: ]/).map{|x| [x.to_sym, true] }.to_h
   RUN.default = false
 elsif ENV["EXCEPT"]
-  RUN = ENV["only"].split(/[,: ]/).map{|x| [x.to_sym, false] }.to_h
+  RUN = ENV["EXCEPT"].split(/[,: ]/).map{|x| [x.to_sym, false] }.to_h
   RUN.default = true
 else
   RUN = Hash.new(true)
