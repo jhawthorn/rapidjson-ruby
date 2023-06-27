@@ -23,6 +23,15 @@ class RubyObjectEncoder {
         writer.EndArray();
     }
 
+    static VALUE string_to_utf8_compatible(VALUE str) {
+        rb_encoding *enc = rb_enc_get(str);
+        if (enc == rb_utf8_encoding() || enc == rb_usascii_encoding()) {
+            return str;
+        } else {
+            return rb_str_export_to_enc(str, rb_utf8_encoding());
+        }
+    }
+
     void encode_key(VALUE key) {
         switch(rb_type(key)) {
             case T_STRING:
@@ -52,6 +61,7 @@ class RubyObjectEncoder {
         }
 
         Check_Type(key, T_STRING);
+        key = string_to_utf8_compatible(key);
         writer.Key(RSTRING_PTR(key), RSTRING_LEN(key), false);
     }
 
@@ -113,6 +123,7 @@ class RubyObjectEncoder {
     }
 
     void encode_string(VALUE v) {
+        v = string_to_utf8_compatible(v);
         writer.String(RSTRING_PTR(v), RSTRING_LEN(v), false);
     }
 
