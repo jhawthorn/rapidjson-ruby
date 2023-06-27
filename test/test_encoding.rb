@@ -33,6 +33,19 @@ class TestEncoding < Minitest::Test
     end
   end
 
+  def test_long_strings
+    [0, 1, 10, 100, 1000, 10_000, 100_000, 1_000_000, 10_000_000].each do |length|
+      text = "a" * length
+      obj = {
+        title: "abc",
+        body: text
+      }
+      json = encode(obj)
+
+      assert %Q{{"title":"abc","body":"#{text}"}} == json
+    end
+  end
+
   private
 
   def encode(object)

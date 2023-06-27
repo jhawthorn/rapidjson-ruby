@@ -12,9 +12,16 @@ class RubyStringBuffer {
             mem = RSTRING_PTR(ruby_string);
         }
 
-        void Reserve(size_t size) {
-            if (capacity - used < size) {
-                resize(capacity * 2);
+        void Reserve(size_t want) {
+            if (capacity - used < want) {
+                size_t new_capacity = capacity;
+                while (new_capacity - used < want) {
+                    if (new_capacity >= SIZE_MAX / 2) {
+                        ruby_malloc_size_overflow(capacity, 2);
+                    }
+                    new_capacity <<= 1;
+                }
+                resize(new_capacity);
             }
         }
 
