@@ -30,12 +30,12 @@ dump(VALUE _self, VALUE obj, VALUE pretty, VALUE as_json, VALUE allow_nan) {
 }
 
 static VALUE
-load(VALUE _self, VALUE string) {
-    RubyObjectHandler handler;
+load(VALUE _self, VALUE string, VALUE allow_nan) {
+    RubyObjectHandler handler(RTEST(allow_nan));
     Reader reader;
     char *cstring = StringValueCStr(string); // fixme?
     StringStream ss(cstring);
-    ParseResult ok = reader.Parse(ss, handler);
+    ParseResult ok = reader.Parse<kParseNanAndInfFlag>(ss, handler);
 
     if (!ok) {
         rb_raise(rb_eParseError, "JSON parse error: %s (%lu)",
@@ -69,7 +69,7 @@ Init_rapidjson(void)
     rb_global_variable(&rb_cRapidJSONFragment);
 
     rb_define_private_method(rb_cCoder, "_dump", dump, 4);
-    rb_define_method(rb_cCoder, "load", load, 1);
+    rb_define_method(rb_cCoder, "_load", load, 2);
     rb_define_method(rb_cCoder, "valid_json?", valid_json_p, 1);
 
     VALUE rb_eRapidJSONError = rb_const_get(rb_mRapidJSON, rb_intern("Error"));

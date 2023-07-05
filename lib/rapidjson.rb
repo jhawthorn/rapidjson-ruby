@@ -17,6 +17,10 @@ module RapidJSON
     def dump(object)
       _dump(object, @pretty, @to_json_proc, @allow_nan)
     end
+
+    def load(string)
+      _load(string, @allow_nan)
+    end
   end
 end
 

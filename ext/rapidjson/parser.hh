@@ -50,6 +50,9 @@ struct RubyObjectHandler : public BaseReaderHandler<UTF8<>, RubyObjectHandler> {
     }
 
     bool Double(double d) {
+        if (!isfinite(d) && !allow_nan) {
+            rb_raise(rb_eParseError, "JSON parse error: Invalid float value");
+        }
         return PutValue(rb_float_new(d));
     }
 
@@ -140,12 +143,13 @@ struct RubyObjectHandler : public BaseReaderHandler<UTF8<>, RubyObjectHandler> {
         return stack[0];
     }
 
-    RubyObjectHandler(): depth(0) {
+    RubyObjectHandler(bool allow_nan): depth(0), allow_nan(allow_nan) {
         stack[0] = Qundef;
     }
 
     static const int MAX_DEPTH = 256;
-    int depth;
     VALUE stack[MAX_DEPTH];
     VALUE last_key[MAX_DEPTH];
+    int depth;
+    bool allow_nan;
 };

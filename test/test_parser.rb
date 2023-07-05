@@ -87,5 +87,17 @@ class TestParser < Minitest::Test
     assert_raises RapidJSON::ParseError do
       parse("Infinity")
     end
+
+    assert_raises RapidJSON::ParseError do
+      parse("-Infinity")
+    end
+  end
+
+  def test_parse_NaN_and_Infinity_allowed
+    coder = RapidJSON::Coder.new(allow_nan: true)
+
+    assert_predicate coder.load("NaN"), :nan?
+    assert_equal Float::INFINITY, coder.load("Inf")
+    assert_equal -Float::INFINITY, coder.load("-Inf")
   end
 end
