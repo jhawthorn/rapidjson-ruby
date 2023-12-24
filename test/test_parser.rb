@@ -74,23 +74,27 @@ class TestParser < Minitest::Test
   def test_parse_too_deep
     max = 256
     assert parse("["*max + "]"*max)
-    assert_raises RapidJSON::ParseError do
+    ex = assert_raises RapidJSON::ParseError do
       assert parse("["*(max+1) + "]"*(max+1))
     end
+    assert_equal "JSON parse error: input too deep", ex.message
   end
 
   def test_parse_NaN_and_Infinity
-    assert_raises RapidJSON::ParseError do
+    ex = assert_raises RapidJSON::ParseError do
       parse("NaN")
     end
+    assert_equal "JSON parse error: Invalid float value", ex.message
 
-    assert_raises RapidJSON::ParseError do
+    ex = assert_raises RapidJSON::ParseError do
       parse("Infinity")
     end
+    assert_equal "JSON parse error: Invalid float value", ex.message
 
-    assert_raises RapidJSON::ParseError do
+    ex = assert_raises RapidJSON::ParseError do
       parse("-Infinity")
     end
+    assert_equal "JSON parse error: Invalid float value", ex.message
   end
 
   def test_parse_NaN_and_Infinity_allowed
