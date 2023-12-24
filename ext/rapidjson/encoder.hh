@@ -206,4 +206,19 @@ class RubyObjectEncoder {
             encode_any(obj, true);
             return buf.GetRubyString();
         }
+
+        struct protected_args {
+            RubyObjectEncoder *encoder;
+            VALUE obj;
+        };
+
+        static VALUE encode_protected_cb(VALUE data) {
+            struct protected_args *args = (struct protected_args *)data;
+            return args->encoder->encode(args->obj);
+        }
+
+        VALUE encode_protected(VALUE obj, int *state) {
+            struct protected_args args = { this, obj };
+            return rb_protect(encode_protected_cb, (VALUE)&args, state);
+        }
 };

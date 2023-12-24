@@ -19,27 +19,44 @@ typedef RubyStringBuffer DefaultBuffer;
 static VALUE
 dump(VALUE _self, VALUE obj, VALUE pretty, VALUE as_json, VALUE allow_nan) {
     // NB: as_json here is not marked by the extension, but is always on the stack
+    VALUE result;
+    int state;
+
     if (RTEST(pretty)) {
         RubyObjectEncoder<DefaultBuffer, PrettyWriter<DefaultBuffer> > encoder(as_json, RTEST(allow_nan));
         encoder.writer.SetIndent(' ', 2);
-        return encoder.encode(obj);
+        result = encoder.encode_protected(obj, &state);
     } else {
         RubyObjectEncoder<DefaultBuffer, Writer<DefaultBuffer> > encoder(as_json, RTEST(allow_nan));
-        return encoder.encode(obj);
+        result = encoder.encode_protected(obj, &state);
     }
+
+    if (state) {
+        rb_jump_tag(state);
+    }
+    return result;
 }
 
 static VALUE
 load(VALUE _self, VALUE string, VALUE allow_nan) {
     RubyObjectHandler handler(RTEST(allow_nan));
-    Reader reader;
-    char *cstring = StringValueCStr(string); // fixme?
-    StringStream ss(cstring);
-    ParseResult ok = reader.Parse<kParseNanAndInfFlag>(ss, handler);
+    ParseResult ok;
+
+    {
+        char *cstring = StringValueCStr(string); // fixme?
+        StringStream ss(cstring);
+        Reader reader;
+        ok = reader.Parse<kParseNanAndInfFlag>(ss, handler);
+    }
 
     if (!ok) {
-        rb_raise(rb_eParseError, "JSON parse error: %s (%lu)",
-                GetParseError_En(ok.Code()), ok.Offset());
+        VALUE err = handler.GetErr();
+        if (RTEST(err)) {
+            rb_exc_raise(err);
+        } else {
+            rb_raise(rb_eParseError, "JSON parse error: %s (%lu)",
+                    GetParseError_En(ok.Code()), ok.Offset());
+        }
     }
 
     return handler.GetRoot();
