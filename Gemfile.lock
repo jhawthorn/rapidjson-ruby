@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rapidjson (0.2.2)
+    rapidjson (0.2.3)
 
 GEM
   remote: https://rubygems.org/
