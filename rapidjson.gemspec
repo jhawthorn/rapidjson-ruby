@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
 
   spec.summary = "Fast JSON encoder/decoder based using RapidJSON"
   spec.description = spec.summary
-  spec.homepage = "https://github.com/jhawthorn/rapidjson"
+  spec.homepage = "https://github.com/jhawthorn/rapidjson-ruby"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 2.6.0"
 
