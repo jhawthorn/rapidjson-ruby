@@ -2,7 +2,7 @@
 
 (Maybe) Ruby's fastest JSON library! Built using the [RapidJSON C++ library](https://rapidjson.org/)
 
-No monkey patches, ActiveSupport integration, `json` gem emulation.
+ActiveSupport integration, `json` gem emulation, and no monkey patches.
 
 ## Installation
 
@@ -44,7 +44,7 @@ RapidJSON.pretty_encode(json_string)
 # }
 ```
 
-By default the encoder is "strict" and will raise an exception
+By default the encoder is "strict" and will raise an exception.
 
 ## ActiveSupport
 
@@ -57,11 +57,11 @@ Add the following to an initializer to opt-in.
 ActiveSupport::JSON::Encoding.json_encoder = RapidJSON::ActiveSupportEncoder
 ```
 
-This makes `model.to_json` ~15x faster, and `nested_hash.to_json` ~27x faster (compred using Rails 7.0)
+This makes `model.to_json` ~15x faster, and `nested_hash.to_json` ~27x faster (compared using Rails 7.0)
 
 ## JSON gem compatibility
 
-Contrary to some other JSON libraries, `RapidJSON` doesn't provice a monkey patch to entirely replace the stdlib JSON gem.
+Contrary to some other JSON libraries, `RapidJSON` doesn't provide a monkey patch to entirely replace the stdlib JSON gem.
 
 However it does provide a module that behave like the stdlib JSON gem and that can be used to monkey patch existing code.
 
@@ -105,11 +105,11 @@ Unless there's good reason, it's probably best sticking with the standard `json`
 However this library has a few performance advantages:
 
 * JSON parsing
-  * Performance is achieved mostly through using RapidJSON one of the fastest open source JSON parsing libraries. It supports SIMD (SSE2, SSE4.2, NEON), avoids allocated memory, and has been honed to be if not the fastest library (that honour likely going to simdjson) the library to beat for JSON performance.
+  * Performance is achieved mostly through using RapidJSON one of the fastest open source JSON parsing libraries. It supports SIMD (SSE2, SSE4.2, NEON), avoids allocated memory, and has been honed to be if not the fastest library (that honour likely going to simdjson), the library to beat for JSON performance.
 * Object allocation
   * Wherever possible we avoid allocating objects. When generating JSON, RapidJSON will write the emitted JSON directly into the buffer of a Ruby string. (This is an optimization most Ruby JSON libraries will have)
   * When parsing JSON we parse directly form the source string with a single copy
-  * When building a Hash for a JSON object, we use an fstrings (dedup'd and frozen strings) as the key
+  * When building a Hash for a JSON object, we use `fstrings` (dedup'd and frozen strings) as the key
   * Whenever possible we build Ruby objects from C types (int, char \*, double) rather than constructing intermediate Ruby string objects.
 
 Many of these optimization can be found in all popular Ruby JSON libraries
