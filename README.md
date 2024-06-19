@@ -51,7 +51,7 @@ By default the encoder is "strict" and will raise an exception.
 RapidJSON provides a drop-in replacement ActiveSupport encoder, with very good compatibility.
 Add the following to an initializer to opt-in.
 
-```
+```ruby
 # config/initializers/rapidjson.rb
 
 ActiveSupport::JSON::Encoding.json_encoder = RapidJSON::ActiveSupportEncoder
@@ -86,7 +86,7 @@ By default RapidJSON will only encode "JSON-ready" types: `Hash`, `Array`, `Inte
 
 RapidJSON::Coder can be initialized with a block which allows the behaviour to be customized. This is how the ActiveSupport encoder and JSON compatibility above are implemented! Just using Ruby :heart:.
 
-```
+```ruby
 RapidJSON::Coder.new do |object, is_key|
   object.to_s # Convert any unknown object to string
 end
@@ -158,4 +158,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the Rapidjson project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/jhawthorn/rapidjson/blob/main/CODE_OF_CONDUCT.md).
+Everyone interacting in the RapidJSON project's codebases, issue trackers, chat rooms, and mailing lists is expected to follow the [code of conduct](https://github.com/jhawthorn/rapidjson/blob/main/CODE_OF_CONDUCT.md).
