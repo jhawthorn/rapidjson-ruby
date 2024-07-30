@@ -14,7 +14,9 @@ module RapidJSON
     # Encode the given object into a JSON string
     def encode(value)
       if @options && !@options.empty?
-        value = value.as_json(@options.dup)
+        if !RapidJSON.json_ready?(value) || @options.key?(:only) || @options.key?(:except)
+          value = value.as_json(@options.dup)
+        end
       end
       json = @coder.dump(value)
       if ActiveSupport::JSON::Encoding.escape_html_entities_in_json

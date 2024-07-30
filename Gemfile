@@ -9,6 +9,8 @@ gem "rake", "~> 13.0"
 gem "rake-compiler"
 gem "minitest", "~> 5.0"
 
+gem "activesupport"
+
 group :benchmark do
   gem "benchmark-ips"
   gem "oj"

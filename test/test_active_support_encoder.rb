@@ -1,20 +1,8 @@
 # frozen_string_literal: true
 
 require "test_helper"
-
-# Sorry
-unless defined?(ActiveSupport::JSON::Encoding)
-  module ActiveSupport
-    module JSON
-      module Encoding
-        class << self
-          attr_accessor :escape_html_entities_in_json
-        end
-        self.escape_html_entities_in_json = false
-      end
-    end
-  end
-end
+require "active_support"
+require "active_support/core_ext/object/json"
 
 class TestActiveSupportEncoder < Minitest::Test
   class AsJSON
@@ -65,6 +53,21 @@ class TestActiveSupportEncoder < Minitest::Test
       encode(BasicObject.new)
     end
     assert_includes ex.message, "as_json"
+  end
+
+  def test_hash_options
+    assert_equal %q{{"key":"value"}}, encode({key: :value, bogus: :garbo}, only: :key)
+    assert_equal %q{{"key":"value"}}, encode({key: :value, bogus: :garbo}, only: [:key])
+    assert_equal %q{{"key":"value"}}, encode({key: :value, bogus: :garbo}, except:  :bogus)
+    assert_equal %q{{"key":"value"}}, encode({key: :value, bogus: :garbo}, except: [:bogus])
+
+    assert_equal %q{[{"key":"value"}]}, encode([{key: :value, bogus: :garbo}], only: :key)
+    assert_equal %q{[{"key":"value"}]}, encode([{key: :value, bogus: :garbo}], only: [:key])
+    assert_equal %q{[{"key":"value"}]}, encode([{key: :value, bogus: :garbo}], except:  :bogus)
+    assert_equal %q{[{"key":"value"}]}, encode([{key: :value, bogus: :garbo}], except: [:bogus])
+
+    assert_equal %q{{}}, encode({bogus: :garbo}, only: [:key])
+    assert_equal %q{{"key":"value"}}, encode({key: :value}, except: [:bogus])
   end
 
   FloatOverride = Module.new
