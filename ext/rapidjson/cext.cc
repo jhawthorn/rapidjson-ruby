@@ -77,6 +77,57 @@ valid_json_p(VALUE _self, VALUE string) {
     return Qtrue;
 }
 
+static bool is_json_ready(VALUE obj);
+
+static int is_json_ready_hash_i(VALUE key, VALUE val, VALUE arg) {
+    bool *result = (bool *)arg;
+
+    if (!RB_TYPE_P(key, T_STRING) && !RB_TYPE_P(key, T_SYMBOL)) {
+        *result = false;
+        return ST_STOP;
+    }
+    if (!is_json_ready(val)) {
+        *result = false;
+        return ST_STOP;
+    }
+    return ST_CONTINUE;
+}
+
+static bool
+is_json_ready(VALUE obj) {
+    switch(rb_type(obj)) {
+        case T_NIL:
+        case T_FALSE:
+        case T_TRUE:
+        case T_FIXNUM:
+        case T_BIGNUM:
+        case T_FLOAT:
+        case T_SYMBOL:
+        case T_STRING:
+            return true;
+        case T_HASH:
+            {
+                bool result = true;
+                rb_hash_foreach(obj, is_json_ready_hash_i, (VALUE)&result);
+                return result;
+            }
+        case T_ARRAY:
+            for (int i = 0; i < RARRAY_LEN(obj); i++) {
+                if (!is_json_ready(RARRAY_AREF(obj, i))) {
+                    return false;
+                }
+            }
+            return true;
+        default:
+            return false;
+    }
+}
+
+static VALUE
+json_ready_p(VALUE _self, VALUE obj) {
+    return is_json_ready(obj) ? Qtrue : Qfalse;
+}
+
 extern "C" void
 Init_rapidjson(void)
 {
@@ -94,4 +145,5 @@ Init_rapidjson(void)
     rb_eEncodeError = rb_define_class_under(rb_mRapidJSON, "EncodeError", rb_eRapidJSONError);
 
     rb_define_singleton_method(rb_mRapidJSON, "json_escape", escape_json, 1);
+    rb_define_singleton_method(rb_mRapidJSON, "json_ready?", json_ready_p, 1);
 }
