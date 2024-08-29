@@ -47,6 +47,18 @@ class TestEncoderCompatibility < Minitest::Test
     assert_compat 0.0
     assert_compat(-0.0)
     assert_compat 155.0
+
+    0.upto(1023) do |e|
+      assert_compat(2.0 ** e)
+    end
+  end
+
+  def test_encode_randomized_floats
+    1000.times do
+      f = [rand(2**64)].pack("Q").unpack1("D")
+      next if f.nan? || f.infinite?
+      assert_compat(f)
+    end
   end
 
   def test_encode_hash

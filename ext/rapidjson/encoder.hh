@@ -122,7 +122,10 @@ class RubyObjectEncoder {
                 }
             }
         } else {
-            writer.Double(f);
+            VALUE str = rb_funcall(v, rb_intern("to_s"), 0);
+            Check_Type(str, T_STRING);
+            encode_raw_json_str(str);
+            //writer.Double(f);
         }
     }
 
