@@ -122,10 +122,19 @@ class RubyObjectEncoder {
                 }
             }
         } else {
-            VALUE str = rb_funcall(v, rb_intern("to_s"), 0);
-            Check_Type(str, T_STRING);
-            encode_raw_json_str(str);
-            //writer.Double(f);
+            // HACK: for standard notation we can use the RapidJSON
+            // implementation, but for values we need scientific notation we
+            // will fallback to Ruby's to_s so that we match JSON's output
+            // exactly.
+            //
+            // Ideally we would just implement both
+            if (f <= -1.0e15 || f >= 1.0e15 || (f >= -0.0001 && f <= 0.0001)) {
+                VALUE str = rb_funcall(v, rb_intern("to_s"), 0);
+                Check_Type(str, T_STRING);
+                encode_raw_json_str(str);
+            } else {
+                writer.Double(f);
+            }
         }
     }
 
