@@ -20,7 +20,9 @@ class TestJsonchecker < Minitest::Test
         assert_match re, ex.message
       else
         assert RapidJSON.valid_json?(original_json)
-        assert RapidJSON.parse(original_json)
+        parsed = RapidJSON.parse(original_json)
+        assert parsed
+        assert RapidJSON.json_ready?(parsed)
       end
     end
   end
