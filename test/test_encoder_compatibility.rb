@@ -84,6 +84,12 @@ class TestEncoderCompatibility < Minitest::Test
     end
   end
 
+  def test_encode_limits
+    RbConfig::LIMITS.each_value do |v|
+      assert_compat(v)
+    end
+  end
+
   def test_encode_hash
     assert_compat({})
     assert_compat({ "foo" => "bar" })
