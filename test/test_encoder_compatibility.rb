@@ -48,6 +48,10 @@ class TestEncoderCompatibility < Minitest::Test
     assert_compat(-0.0)
     assert_compat 155.0
 
+    # Found via random test, this is the exact representation
+    assert_compat 103876218730131.625
+    assert_compat -169986783765216.875
+
     0.upto(1023) do |e|
       assert_compat(2.0 ** e)
       assert_compat(2.0 ** -e)
