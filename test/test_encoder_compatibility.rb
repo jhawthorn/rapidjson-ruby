@@ -47,6 +47,47 @@ class TestEncoderCompatibility < Minitest::Test
     assert_compat 0.0
     assert_compat(-0.0)
     assert_compat 155.0
+
+    # Found via random test, this is the exact representation
+    assert_compat 103876218730131.625
+    assert_compat(-169986783765216.875)
+
+    0.upto(1023) do |e|
+      assert_compat(2.0 ** e)
+      assert_compat(2.0 ** -e)
+    end
+  end
+
+  def test_encode_randomized_floats
+    1000.times do
+      f = [rand(2**64)].pack("Q").unpack1("D")
+      next if f.nan? || f.infinite?
+      assert_compat(f)
+    end
+  end
+
+  def test_float_scientific_threshold
+    assert_implementations_equal do |json|
+      (1.0..).bsearch{ |x| json.dump(x).include?("e") }
+    end
+
+    assert_implementations_equal do |json|
+      (1.0..).bsearch{ |x| json.dump(-x).include?("e") }
+    end
+
+    assert_implementations_equal do |json|
+      (1.0..).bsearch{ |x| json.dump(1.0 / x).include?("e") }
+    end
+
+    assert_implementations_equal do |json|
+      (1.0..).bsearch{ |x| json.dump(-1.0 / x).include?("e") }
+    end
+  end
+
+  def test_encode_limits
+    RbConfig::LIMITS.each_value do |v|
+      assert_compat(v)
+    end
   end
 
   def test_encode_hash
@@ -175,10 +216,20 @@ class TestEncoderCompatibility < Minitest::Test
   end
 
   def assert_dump_equal(object, *args)
-    assert_equal ::JSON.dump(object, *args), RapidJSON::JSONGem.dump(object, *args)
+    assert_implementations_equal do |json|
+      json.dump(object, *args)
+    end
   end
 
   def assert_generate_equal(object, *args)
-    assert_equal ::JSON.generate(object, *args), RapidJSON::JSONGem.generate(object, *args)
+    assert_implementations_equal do |json|
+      json.generate(object, *args)
+    end
+  end
+
+  def assert_implementations_equal(&block)
+    expected = yield(::JSON)
+    actual = yield(RapidJSON::JSONGem)
+    assert_equal expected, actual
   end
 end

@@ -102,6 +102,6 @@ class TestParser < Minitest::Test
 
     assert_predicate coder.load("NaN"), :nan?
     assert_equal Float::INFINITY, coder.load("Inf")
-    assert_equal -Float::INFINITY, coder.load("-Inf")
+    assert_equal(-Float::INFINITY, coder.load("-Inf"))
   end
 end

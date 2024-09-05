@@ -122,7 +122,12 @@ class RubyObjectEncoder {
                 }
             }
         } else {
-            writer.Double(f);
+            // TODO: We should avoid relying on to_s and do this conversion
+            // ourselves. However it's difficult to get the exact same rounding
+            // and truncation that Ruby uses.
+            VALUE str = rb_funcall(v, rb_intern("to_s"), 0);
+            Check_Type(str, T_STRING);
+            encode_raw_json_str(str);
         }
     }
 
