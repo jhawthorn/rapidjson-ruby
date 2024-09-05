@@ -18,3 +18,6 @@ jobs:
         with:
           bundler-cache: true
           ruby-version: ruby
+
+      # Release
+      - uses: rubygems/release-gem@v1
