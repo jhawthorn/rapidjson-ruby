@@ -1,9 +1,10 @@
+name: Push gem to RubyGems.org
+
 on:
   workflow_dispatch:
 
 jobs:
   push:
-    name: Push gem to RubyGems.org
     runs-on: ubuntu-latest
 
     environment: 
@@ -17,6 +18,8 @@ jobs:
     steps:
       # Set up
       - uses: actions/checkout@v4
+        with:
+          submodules: true
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
