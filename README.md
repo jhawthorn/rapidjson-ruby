@@ -1,6 +1,9 @@
+> [!WARNING]  
+> The recent work on performance and the [`JSON::Coder`](https://github.com/ruby/json#jsoncoder) interface in the standard `json` gem has made this library unnecessary 🎉. Please just use `json`!
+
 # RapidJSON
 
-(Maybe) Ruby's fastest JSON library! Built using the [RapidJSON C++ library](https://rapidjson.org/)
+Formerly Ruby's fastest JSON library! Built using the [RapidJSON C++ library](https://rapidjson.org/)
 
 ActiveSupport integration, `json` gem emulation, and no monkey patches.
 
