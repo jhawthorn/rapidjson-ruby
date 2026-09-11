@@ -45,7 +45,6 @@ class RubyObjectEncoder {
             default:
                 if (NIL_P(as_json)) {
                     rb_raise(rb_eTypeError, "Invalid object key type: %" PRIsVALUE, rb_obj_class(key));
-                    UNREACHABLE_RETURN();
                 }
 
                 VALUE args[2] = { key, Qtrue };
@@ -150,7 +149,6 @@ class RubyObjectEncoder {
     void encode_generic(VALUE obj) {
         if (NIL_P(as_json)) {
             rb_raise(rb_eTypeError, "Don't know how to serialize %" PRIsVALUE " to JSON", rb_obj_class(obj));
-            UNREACHABLE_RETURN();
         }
 
         VALUE args[2] = { obj, Qfalse };

@@ -7,6 +7,9 @@ jobs:
   push:
     runs-on: ubuntu-latest
 
+    env:
+      BUNDLE_WITHOUT: benchmark
+
     environment: 
       name: rubygems.org
       url: https://rubygems.org/gems/rapidjson
